@@ -1,0 +1,113 @@
+Export
+======
+
+This xliff generator is built to run on a LinguaPlone enabled site. It can produce an XLIFF representation of any object that implements LinguaPlone.interfaces.ITranslatable.
+
+    >>> from Products.LinguaPlone.interfaces import ITranslatable
+
+It assumes that all attributes on an object should be represented which are not flagged as languageIndependent. We create an object and fill it with some english content.
+
+    >>> self.loginAsPortalOwner()
+    >>> _ = self.folder.invokeFactory('Document', 'doc_en')
+    >>> doc_en = self.folder.doc_en
+    >>> ITranslatable.providedBy(doc_en)
+    True
+    >>> doc_en.setTitle("My english title")
+    >>> doc_en.setDescription("My english description")
+    >>> doc_en.setText("My english text")
+    >>> doc_en.reindexObject()
+ 
+A check that certain attributes characteristical for a document are language dependent:    
+    
+    >>> schema = doc_en.Schema()
+    >>> lang_deps = [x for x in schema.keys() if schema[x].languageIndependent==False]
+    >>> 'id' in lang_deps and 'title' in lang_deps and 'description' in lang_deps and 'text' in lang_deps 
+    True
+
+Now we can create the xliff representation for all language dependent fields by adapting the object to IXLIFFExporter.
+
+    >>> from slc.xliff.interfaces import IXLIFFExporter
+    >>> from Products.Archetypes.interfaces import IBaseObject
+    >>> IBaseObject.providedBy(doc_en)
+    True
+    >>> xliffexporter = IXLIFFExporter(doc_en)
+
+You can configure the export by selecting to only export the current object or you can select to export the current containers contents recursively. You can also select if you want the output displayed as one or multiple files. You can choose to export in HTML compatibility mode and whether you want to get a plaintext file or a zip download. Multiple files cannot be displayed directly in the browser, in that case all files will be shown as one instead. In this example we keep the default settings for the export. 
+
+    >>> xliffexporter.recursive = False
+    >>> xliffexporter.single_file = True
+    >>> xliffexporter.html_compatibility = False
+    >>> xliffexporter.zip = False
+    >>> xliffexporter.source_language="en"
+    >>> data = xliffexporter.export()
+
+The xliff representation stores the objects uid to find it again after translation for restore.
+
+    >>> from slc.xliff.BeautifulSoup import BeautifulSoup
+    >>> soup = BeautifulSoup(data)
+    >>> soup.findAll('file')[0]['oid'].encode('utf-8') == doc_en.UID()
+    True
+    
+Adapters are used to define the attributes to export in xliff. Let's see if all attributes of the 
+document are present in the xliff file:    
+    
+    >>> [x['id'] for x in soup.findAll('trans-unit')]
+    [u'title', u'description', u'text']
+
+And of course the values that we have set before appear at the correct positions:
+
+    >>> soup.find('trans-unit', attrs={'id':'title'}).findNext('source').string.strip()
+    u'My english title'
+    
+    >>> soup.find('trans-unit', attrs={'id':'description'}).findNext('source').string.strip()
+    u'My english description'
+    
+    >>> soup.find('trans-unit', attrs={'id':'text'}).findNext('source').renderContents().strip()
+    '<p>My english text</p>'
+    
+
+Zip file usage 
+--------------
+
+We can also get the xliff file within a zip. 
+
+    >>> xliffexporter.zip = True
+    >>> data = xliffexporter.export()
+    >>> zf = self.is_zip(data)
+
+    >>> from zipfile import ZipFile
+    >>> zf.__class__ == ZipFile
+    True
+    >>> "/".join(doc_en.getPhysicalPath()) in zf.namelist()  
+    True
+    
+The zip is especially useful if we want to export recursively. Then we would receive multiple files. This is only possible inside an archive. First we set up some additional files within the folder. Recursive always means "Everything from the current folder". I recursive is called on a non folderish object, that objects parent folder is used.
+
+    >>> _ = self.folder.invokeFactory('Event', 'event_en')
+    >>> event_en = self.folder.event_en
+    >>> ITranslatable.providedBy(event_en)
+    True
+    >>> event_en.setTitle("My english event title")
+    >>> event_en.setDescription("My english event description")
+    >>> event_en.setText("My english event text")
+    >>> event_en.reindexObject()
+    
+    >>> xliffexporter.recursive = True
+    >>> xliffexporter.single_file = False
+    >>> data = xliffexporter.export()
+    >>> zf = self.is_zip(data)
+    >>> zf.__class__ == ZipFile
+    True
+    
+We now get 3 results, the folder, the document and the event.
+
+    >>> len(zf.namelist())
+    3
+    
+    >>> "/".join(event_en.getPhysicalPath()) in zf.namelist()[2]
+    True
+    
+
+
+
+

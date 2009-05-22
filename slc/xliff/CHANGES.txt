@@ -1,0 +1,10 @@
+1.0b1
+-----
+
+* Added export support for IObjectManager
+* Added browser views, actions
+
+1.0a1
+-----
+
+* port from eITXliffTool to slc.xliff plone3 compatible

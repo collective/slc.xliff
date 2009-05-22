@@ -1,0 +1,9 @@
+    <trans-unit id="title" tal:attributes="id options/id">
+        <source xml:lang='en' 
+                tal:attributes="xml:lang options/source_language"
+                tal:content="options/value">
+        </source>
+        <target xml:lang='de'
+                tal:attributes="xml:lang options/source_language">
+        </target>
+    </trans-unit>

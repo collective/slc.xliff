@@ -1,0 +1,35 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="slc.xliff">
+    
+    <browser:resource
+        name="xliff_success_icon.gif"
+        image="templates/success_icon.gif"
+        />
+
+    <browser:resource
+        name="xliff_failure_icon.gif"
+        image="templates/failure_icon.gif"
+        />
+        
+    <browser:resource
+        name="xliff_icon.gif"
+        image="templates/xliff_icon.gif"
+        />
+        
+    <browser:page
+        for="*"
+        name="xliffexport"
+        permission="cmf.ModifyPortalContent"
+        class=".xliff_forms.ExportXliffForm"
+        />
+        
+    <browser:page
+        for="*"
+        name="xliffimport"
+        permission="cmf.ModifyPortalContent"
+        class=".xliff_forms.ImportXliffForm"
+        />
+                  
+</configure>

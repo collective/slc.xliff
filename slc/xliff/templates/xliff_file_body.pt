@@ -1,0 +1,11 @@
+﻿<file original="" path="" oid="" source-language="en" target-language="en"
+      tal:attributes="original          options/path;
+                      oid               options/oid;"
+                      source-language   options/source_language;
+                      target-language   options/target_language">
+<body>
+<group>
+<tal:block replace="options/attrs"></tal:block>    
+</group>
+</body>
+</file>

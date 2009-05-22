@@ -1,0 +1,7 @@
+TODO
+====
+
+- add tests
+- add html compatibility mode
+- descriptions to forms
+- i18n cleanup

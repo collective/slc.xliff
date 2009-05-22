@@ -1,0 +1,9 @@
+Changelog for slc.xliff
+
+    (name of developer listed in brackets)
+
+slc.xliff - 0.1 Unreleased
+
+    - Initial package structure.
+      [zopeskel]
+

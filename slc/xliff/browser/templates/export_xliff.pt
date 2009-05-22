@@ -1,0 +1,64 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"
+      xmlns:tal="http://xml.zope.org/namespaces/tal" 
+      xmlns:metal="http://xml.zope.org/namespaces/metal" 
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/@@standard_macros/page"
+      lang="en-US"
+      i18n:domain="slc.xliff">
+      <head></head>      
+
+ <body>
+
+  <div metal:fill-slot="body" i18n:domain="slc.xliff">
+
+   <form id="zc.page.browser_form"
+         action="."
+         method="post"
+         enctype="multipart/form-data"
+         tal:attributes="action request/URL">
+
+         <input type="hidden" value="zc.page.browser_form" name="formname" />
+
+         <div metal:use-macro="context/@@base-pageform.html/macros/form">
+             <div metal:fill-slot="above_buttons">
+
+            <div class="field" tal:condition="view/have_shoppinglist">
+                    <input class="checkboxType" 
+                           id="form.export_shoppinglist" 
+                           name="form.export_shoppinglist"
+                           type="checkbox" />
+                    <label for='form.export_shoppinglist' i18n:translate="label_export_shoppinglist">Export my current Shoppinglist</label>
+                    <fieldset>
+                        <legend i18n:translate="legend_items_in_shoppinglist">Items currently in my shoppinglist</legend>
+                        <span class="discreet" tal:condition="not:view/shoppinglist" i18n:translate="description_no_items">
+                            There are no items in your shoppinglist
+                        </span>
+                        <ul>
+                            <li tal:repeat="article view/shoppinglist">
+                                <a tal:attributes="href article/url" tal:content="article/title" /> 
+                                (<span tal:replace="article/url" />)
+                            </li>
+                        </ul>
+                    </fieldset>
+            </div>
+
+
+            <div class="field">
+                <label>Expected Export Results:</label>
+                <div class="formHelp">
+                    <span i18n:translate="help_currentobject">
+                        If you press export now, yo will get an xliff document on this position or subtree (if you select the recursive option):</span><br>
+                  <b>Path: </b><span tal:replace="context/absolute_url" />
+                </div>
+
+            </div>
+
+             </div>
+         </div>
+
+
+    </form>
+
+   </div>
+ </body>
+</html>

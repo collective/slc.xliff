@@ -35,8 +35,7 @@ tests_require=['zope.testing']
 setup(name='slc.xliff',
       version=version,
       description="A framework to allow im and export of xliff files for translations",
-      long_description="""\
-""",
+      long_description= long_description,
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
         "Framework :: Plone",

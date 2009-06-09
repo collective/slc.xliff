@@ -1,6 +1,36 @@
+# -*- coding: utf-8 -*-
+"""
+This module contains the  slc.xliff package
+"""
+import os
 from setuptools import setup, find_packages
 
-version = '0.1'
+def read(*rnames):
+    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+
+version = '1.0'
+
+long_description = (
+    read('README.txt')
+    + '\n' +
+    'Change history\n'
+    '**************\n'
+    + '\n' +
+    read('CHANGES.txt')
+    + '\n' +
+    'Detailed Documentation\n'
+    '**********************\n'
+    + '\n' +
+    read('slc', 'xliff', 'README.txt')
+    + '\n' +
+    'Contributors\n'
+    '************\n'
+    + '\n' +
+    read('CONTRIBUTORS.txt')
+    + '\n' 
+    )
+    
+tests_require=['zope.testing']
 
 setup(name='slc.xliff',
       version=version,
@@ -28,7 +58,12 @@ setup(name='slc.xliff',
           'setuptools',
           # -*- Extra requirements: -*-
       ],
+      tests_require=tests_require,
+      extras_require=dict(tests=tests_require),
+      test_suite = 'slc.xliff.tests.test_docs.test_suite',
       entry_points="""
-      # -*- Entry points: -*-
+      # -*- entry_points -*- 
       """,
-      )
+      paster_plugins = ["ZopeSkel"],
+      )      
+      

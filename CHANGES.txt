@@ -1,0 +1,20 @@
+slc.xliff Changelog
+===================
+
+slc.xliff 1.0 (2008-03-31)
+--------------------------
+
+- packaged egg
+
+slc.xliff 1.0b1
+---------------
+
+* Added export support for IObjectManager
+* Added browser views, actions
+
+slc.xliff 1.0a1
+---------------
+
+* port from eITXliffTool to slc.xliff plone3 compatible
+
+

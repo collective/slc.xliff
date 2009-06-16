@@ -101,13 +101,8 @@ The zip is especially useful if we want to export recursively. Then we would rec
     
 We now get 3 results, the folder, the document and the event.
 
-    >>> len(zf.namelist())
-    3
-    
-    >>> "/".join(event_en.getPhysicalPath()) in zf.namelist()[2]
+	>>> len(zf.namelist())
+	3
+
+    >>> "/".join(event_en.getPhysicalPath()) in zf.namelist()
     True
-    
-
-
-
-

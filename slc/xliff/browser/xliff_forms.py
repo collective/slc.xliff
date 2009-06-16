@@ -41,8 +41,8 @@ class ExportXliffForm(formbase.PageForm):
 
     def have_shoppinglist(self):
         return HAVE_SHOPPINGLIST
-        
-        
+
+
     def shoppinglist(self):
         """ returns the titles of the items currently in the shoppinglist """
         context = aq_inner(self.context)
@@ -51,14 +51,14 @@ class ExportXliffForm(formbase.PageForm):
         member = mtool.getAuthenticatedMember()
         sl = member.getProperty('shoppinglist', tuple())
         brains = pc(UID=sl)
-        
+
         mylist = list()
         for b in brains:
             if b is not None:
                 mylist.append(dict(uid=b.UID, title=b.Title, url=b.getURL()))
 
         return mylist
-        
+
     @form.action(u'Export')
     def action_export(self, action, data):
         context = aq_inner(self.context)
@@ -83,26 +83,26 @@ class ExportXliffForm(formbase.PageForm):
         xliffexporter.single_file = single_file
         xliffexporter.html_compatibility = html_compatibility
         xliffexporter.zip = zip
-        xliffexporter.source_language="en"
+        xliffexporter.source_language = "en"
         xliffexporter.export_shoppinglist = export_shoppinglist
-        
+
         if export_shoppinglist is True:
             xliffexporter.shoppinglist = [x['uid'] for x in self.shoppinglist()]
-            
+
         data = xliffexporter.export()
-        
+
         if zip is True:
             self.request.response.setHeader('Content-type', 'application/zip')
-            self.request.response.setHeader('Content-Disposition', 
-                                            'attachment; filename=xliff_export_%s.zip' % DateTime().strftime('%Y-%m-%d') ) 
+            self.request.response.setHeader('Content-Disposition',
+                                            'attachment; filename=xliff_export_%s.zip' % DateTime().strftime('%Y-%m-%d'))
         elif html_compatibility and single_file:
             self.request.response.setHeader('Content-type', 'text/html')
-            self.request.response.setHeader('Content-Disposition', 
-                                            'attachment; filename=%s_xliff.html' % context.getId() )  
+            self.request.response.setHeader('Content-Disposition',
+                                            'attachment; filename=%s_xliff.html' % context.getId())
         elif single_file:
             self.request.response.setHeader('Content-type', 'text/xml')
-            self.request.response.setHeader('Content-Disposition', 
-                                            'attachment; filename=%s.xliff' % context.getId() ) 
+            self.request.response.setHeader('Content-Disposition',
+                                            'attachment; filename=%s.xliff' % context.getId())
         else:
             pass    # Should not happen
 
@@ -130,17 +130,17 @@ class ImportXliffForm(formbase.PageForm):
         errors = xliffimporter.upload(file, html_compatibility=False)
         if errors != []:
             error = ["%s: %s" % x for x in errors]
-            confirm = _(u"Error while importing Xliff.\n "+"\n".join(error))
+            confirm = _(u"Error while importing Xliff.\n " + "\n".join(error))
             IStatusMessage(self.request).addStatusMessage(confirm, type='warn')
         else:
             confirm = _(u"Xliff import successful.")
             IStatusMessage(self.request).addStatusMessage(confirm, type='info')
 
-        self.request.response.redirect(context.absolute_url()+'/@@xliffimport') 
-        
+        self.request.response.redirect(context.absolute_url() + '/@@xliffimport')
+
         return ''
 
-        
+
 
 
 

@@ -13,10 +13,6 @@ def test_suite():
 
         # Demonstrate the usage
         ztc.ZopeDocFileSuite(
-            'doc/README.txt', package='slc.xliff',
-            test_class=base.XLIFFFunctionalTestCase,
-            optionflags=doctest.REPORT_ONLY_FIRST_FAILURE | doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS),
-        ztc.ZopeDocFileSuite(
             'doc/export.txt', package='slc.xliff',
             test_class=base.XLIFFFunctionalTestCase,
             optionflags=doctest.REPORT_ONLY_FIRST_FAILURE | doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS),

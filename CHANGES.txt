@@ -1,6 +1,13 @@
 slc.xliff Changelog
 ===================
 
+slc.xliff 1.1 (2009-06-19)
+--------------------------
+
+- code cleanup (gerken)
+
+- fixed tests (gerken)
+
 slc.xliff 1.0 (2008-03-31)
 --------------------------
 

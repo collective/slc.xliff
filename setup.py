@@ -55,6 +55,7 @@ setup(name='slc.xliff',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'p4a.fileimage',
           # -*- Extra requirements: -*-
       ],
       tests_require=tests_require,

@@ -1,10 +1,14 @@
 slc.xliff Changelog
 ===================
 
-slc.xliff 1.2 (unreleased)
---------------------------
+1.2 (2009-12-13)
+----------------
 
 - Added EUPL license (deroiste)
+- When exporting by path, sort results by pyth (shortest first),
+  to make sure top-level objects come first. (thomasw)
+- Enabled epoxrt of slc.seminarportal's Seminar (thomasw)
+
 
 slc.xliff 1.1 (2009-06-19)
 --------------------------

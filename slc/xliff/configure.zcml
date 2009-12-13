@@ -2,6 +2,7 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="slc.xliff">
 
     <five:registerPackage package="." initialize=".initialize" />
@@ -30,5 +31,8 @@
     <adapter factory=".xliff.NewsItemAttributeExtractor" />
     <adapter factory=".xliff.LinkAttributeExtractor" />
 
+    <configure zcml:condition="installed slc.seminarportal">
+        <adapter factory=".xliff.SeminarAttributeExtractor" />
+    </configure>
 
 </configure>

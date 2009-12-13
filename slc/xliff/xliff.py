@@ -14,6 +14,12 @@ from Products.ATContentTypes.interface.event import IATEvent
 from Products.ATContentTypes.interface.link import IATLink
 from Products.ATContentTypes.interface.news import IATNewsItem
 from Products.ATContentTypes.interface.topic import IATTopic
+try:
+    from slc.seminarportal.interfaces import ISeminar
+except ImportError:
+    class ISeminar(interface.Interface):
+        """ Dummy """
+
 from StringIO import StringIO
 
 from slc.xliff.BeautifulSoup import BeautifulSoup, BeautifulStoneSoup
@@ -411,5 +417,9 @@ class LinkAttributeExtractor(BaseAttributeExtractor):
     attrs = ['title', 'description', 'remoteUrl']
 
 
-
+class SeminarAttributeExtractor(BaseAttributeExtractor):
+    """ Adapter to retrieve attributes from a seminar """
+    implements(IAttributeExtractor)
+    adapts(ISeminar)
+    attrs = ['title', 'description', 'location', 'summary', 'conclusions', 'furtherActions' ]
 

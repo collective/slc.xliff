@@ -4,7 +4,7 @@ slc.xliff Changelog
 1.2.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Bugfix, wrong dummy interface definition (thomasw)
 
 
 1.2 (2009-12-13)

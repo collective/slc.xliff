@@ -3,7 +3,7 @@ from types import *
 
 from Acquisition import aq_inner, aq_base
 
-from zope.interface import implements
+from zope.interface import implements, Interface
 from zope.component import adapts, getUtility
 from zope.app.component.hooks import getSite
 
@@ -17,7 +17,7 @@ from Products.ATContentTypes.interface.topic import IATTopic
 try:
     from slc.seminarportal.interfaces import ISeminar
 except ImportError:
-    class ISeminar(interface.Interface):
+    class ISeminar(Interface):
         """ Dummy """
 
 from StringIO import StringIO

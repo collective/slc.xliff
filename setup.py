@@ -13,9 +13,6 @@ version = '1.2-dev'
 long_description = (
     read('README.txt')
     + '\n' +
-    'Change history\n'
-    '**************\n'
-    + '\n' +
     read('CHANGES.txt')
     + '\n' +
     'Detailed Documentation\n'
@@ -66,6 +63,5 @@ setup(name='slc.xliff',
       entry_points="""
       # -*- entry_points -*- 
       """,
-      paster_plugins = ["ZopeSkel"],
       )      
       

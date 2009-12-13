@@ -226,6 +226,10 @@ class XLIFFExporter(object):
 
         object_provides = "Products.LinguaPlone.interfaces.ITranslatable"
         results = catalog(path=path, object_provides=object_provides)
+        # make a real list out the LazyMap
+        results = list(results)
+        # sort by path, so that top-level object will get translated first
+        results.sort(lambda x,y: cmp(len(x.getPath()), len(y.getPath())))
 
         return [r.getObject() for r in results]
 

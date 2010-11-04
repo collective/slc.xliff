@@ -5,8 +5,6 @@
     xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="slc.xliff">
 
-    <includeDependencies package="." />
-
     <five:registerPackage package="." initialize=".initialize" />
 
     <genericsetup:registerProfile

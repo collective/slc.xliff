@@ -27,7 +27,7 @@ long_description = (
     + '\n' 
     )
     
-tests_require=['zope.testing', 'Products.PloneTestCase','pillow']
+tests_require=['zope.testing']
 
 setup(name='slc.xliff',
       version=version,
@@ -54,14 +54,11 @@ setup(name='slc.xliff',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'z3c.autoinclude',
           'p4a.fileimage',
-          'zope.component',
-          'Products.LinguaPlone',
           # -*- Extra requirements: -*-
       ],
       tests_require=tests_require,
-      extras_require=dict(tests=tests_require, plone4=['Zope2']),
+      extras_require=dict(tests=tests_require),
       test_suite = 'slc.xliff.tests.test_docs.test_suite',
       entry_points="""
       # -*- entry_points -*- 

@@ -1,6 +1,6 @@
 from Acquisition import aq_inner, aq_base
 from zope.formlib import form
-from Products.Five.formlib import formbase
+from five.formlib import formbase
 from zope.interface import implements
 from zope.component import adapts, getUtility
 from DateTime import DateTime

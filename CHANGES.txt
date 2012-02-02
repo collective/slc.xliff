@@ -4,8 +4,8 @@ slc.xliff Changelog
 1.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Set a document's text_format (e.g. text/html) based on the source's
+  setting (thomasw)
 
 1.2.1 (2009-12-13)
 ------------------

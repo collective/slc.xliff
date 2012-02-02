@@ -1,4 +1,7 @@
-import zipfile, logging, transaction
+# -*- coding: utf-8 -*-
+import zipfile
+import logging
+import transaction
 from types import *
 
 from Acquisition import aq_inner, aq_base
@@ -18,29 +21,32 @@ from Products.ATContentTypes.interface.topic import IATTopic
 try:
     from slc.seminarportal.interfaces import ISeminar
 except ImportError:
+
     class ISeminar(Interface):
         """ Dummy """
 
 from StringIO import StringIO
 
 from slc.xliff.BeautifulSoup import BeautifulSoup, BeautifulStoneSoup
-from slc.xliff.interfaces import IXLIFFExporter, IXLIFFImporter, IXLIFF, IAttributeExtractor
+from slc.xliff.interfaces import IXLIFFExporter, IXLIFFImporter, IXLIFF, \
+    IAttributeExtractor
 
 from templates.xliff import *
 from templates.html import *
 
 logger = logging.getLogger('slc.xliff')
 
+
 class XLIFFImporter(object):
-    """ utility to reimport xliff translations and create/edit the respective objects """
+    """ utility to reimport xliff translations and create/edit the respective
+    objects """
 
     implements(IXLIFFImporter)
-
 
     def upload(self, data, html_compatibility=False):
         """ write one or more xliff documents from a file or zip onto objects
         """
-        # data maybe a zip file or a plain file. 
+        # data maybe a zip file or a plain file.
         # A zip may contain one or more files
         # each file may contain one or more file sections
 
@@ -57,13 +63,15 @@ class XLIFFImporter(object):
             filename = getattr(data, 'filename', 'direct_upload')
             dataread = data.read()
 
-            # check what type data is and reject other than text/xml and application/zip
+            # check what type data is and reject other than text/xml
+            # and application/zip
             mtr = getToolByName(site, 'mimetypes_registry')
             mimetype = mtr.classify(dataread) #, filename=filename)
 
             if mimetype.major() == 'text':
                 filetype = 'plain'
-            elif mimetype.major() == 'application' and mimetype.minor() in ['zip', 'x-zip-compressed']:
+            elif mimetype.major() == 'application' and mimetype.minor() in \
+                ['zip', 'x-zip-compressed']:
                 filetype = 'zip'
             else:
                 errors.append(('File error', "File type unknown"))
@@ -83,7 +91,8 @@ class XLIFFImporter(object):
                 filelist.append((filename, dataread))
 
         else:
-            errors.append(('TypeError', "The xliff upload content is not of type plain text or zip."))
+            errors.append(('TypeError', "The xliff upload content is not of "
+                "type plain text or zip."))
 
 
         for xliff in filelist:
@@ -91,14 +100,16 @@ class XLIFFImporter(object):
             target_language = _guessLanguage(xliff[0])
             file_sections = soup.findAll('file')
             if soup.findAll('file') == []:
-                errors.append(('Empty File?', '%s contains no file sections.' % xliff[0]))
+                errors.append(('Empty File?', '%s contains no file sections.' \
+                % xliff[0]))
             dbg = 0
             for section in file_sections:
                 if dbg == 1:
                     self._setXLIFF(section, target_language=target_language)
                 else:
                     try:
-                        self._setXLIFF(section, target_language=target_language)
+                        self._setXLIFF(section,
+                            target_language=target_language)
                     except ValueError, ve:
                         errors.append(('Target Object', str(ve)))
                     except Exception, e:
@@ -125,7 +136,8 @@ class XLIFFImporter(object):
             oid = data['oid'].encode('ascii')
             results = uid_catalog(UID=oid)
             if len(results) != 1:
-                #raise ValueError, "Uid catalog should return exactly one result but returned %s." % len(results)
+                #raise ValueError, "Uid catalog should return exactly one
+                #result but returned %s." % len(results)
                 raise KeyError, "Invalid OID %s" % oid
             source_ob = results[0].getObject()
         except KeyError:
@@ -137,8 +149,10 @@ class XLIFFImporter(object):
         if source_ob is None:
             return
 
-        # If the source object is language-neutral, it must receive a language prior to translation
-        # XXXX What to do if the source_ob HAS a language, but it differs from the source-language inside the data?
+        # If the source object is language-neutral, it must receive a language
+        # prior to translation
+        # XXXX What to do if the source_ob HAS a language, but it differs
+        # from the source-language inside the data?
         if source_ob.Language() == '':
             # Get the source language from the data
             source_language = data.get('source-language')
@@ -160,16 +174,20 @@ class XLIFFImporter(object):
             fieldname = unit['id'].encode('utf-8')
             value = unit.find('target').renderContents('utf-8').strip()
 
-            # Note: We don't use xliff to remove values, so no value means no translation and no change to the original
-            # XXX: This doesn't handle values other than strings, this may be a problem.
+            # Note: We don't use xliff to remove values, so no value means no
+            # translation and no change to the original
+            # XXX: This doesn't handle values other than strings, this may be
+            # a problem.
             if not value:
                 continue
 
             # convert HTML entities
             try:
-                value = unicode(BeautifulStoneSoup(value, convertEntities=BeautifulStoneSoup.HTML_ENTITIES))
+                value = unicode(BeautifulStoneSoup(value,
+                    convertEntities=BeautifulStoneSoup.HTML_ENTITIES))
             except Exception, err:
-                print "Could not convert HTML entities on %s / %s\n\tError: %s " % (target_ob.absolute_url(), fieldname, err)
+                print "Could not convert HTML entities on %s / %s\n\tError: "
+                "%s" % (target_ob.absolute_url(), fieldname, err)
             values[fieldname] = value
 
         target_ob.processForm(data=1, metadata=1, values=values)
@@ -179,7 +197,8 @@ class XLIFFImporter(object):
 
 
 class XLIFFExporter(object):
-    """ adapter to generate an xliff representation from an archetype object """
+    """ adapter to generate an xliff representation from an archetype
+    object """
 
     implements(IXLIFFExporter)
 
@@ -211,19 +230,19 @@ class XLIFFExporter(object):
 
         for ob in SLOBs:
             all_obs.add(ob)
-            # recursive 
+            # recursive
             if self.recursive is True and ob.isPrincipiaFolderish:
                 [all_obs.add(x) for x in self._getObjectsByPath(ob)]
 
         return list(all_obs)
-
 
     def _getObjectsByPath(self, ob=None):
         catalog = getToolByName(self.context, 'portal_catalog')
         if ob is None:
             ob = aq_inner(self.context)
         if not ob.isPrincipiaFolderish:
-            # context is not a folder but we should work recursive => use parent folder
+            # context is not a folder but we should work recursive
+            # => use parent folder
             path = "/".join(ob.getPhysicalPath()[:-1])
         else:
             path = "/".join(ob.getPhysicalPath())
@@ -233,10 +252,9 @@ class XLIFFExporter(object):
         # make a real list out the LazyMap
         results = list(results)
         # sort by path, so that top-level object will get translated first
-        results.sort(lambda x,y: cmp(len(x.getPath()), len(y.getPath())))
+        results.sort(lambda x, y: cmp(len(x.getPath()), len(y.getPath())))
 
         return [r.getObject() for r in results]
-
 
     def export(self):
         if self.export_shoppinglist == True:
@@ -256,9 +274,9 @@ class XLIFFExporter(object):
         for ob in objects:
             xob = IXLIFF(ob)
             xliff_pages.append((
-                                "/".join(ob.getPhysicalPath()) ,
-                                 xob.render(self.html_compatibility, self.source_language)
-                                ))
+                "/".join(ob.getPhysicalPath()),
+                xob.render(self.html_compatibility, self.source_language),
+                ))
 
         if self.zip == True:
             Z = StringIO()
@@ -266,12 +284,15 @@ class XLIFFExporter(object):
 
             if self.single_file == True:    # single file as zip
                 if len(xliff_pages) == 1:
-                    zf.writestr(xliff_pages[0][0], HEAD % dict(content=xliff_pages[0][1]))
+                    zf.writestr(xliff_pages[0][0],
+                    HEAD % dict(content=xliff_pages[0][1]))
                 else:
                     data = [x[1] for x in xliff_pages]
-                    zf.writestr('export.xliff', HEAD % dict(content="\n".join(data)))
+                    zf.writestr('export.xliff',
+                    HEAD % dict(content="\n".join(data)))
 
-            else:                           # multiple files as zip
+            # multiple files as zip
+            else:
                 for page in xliff_pages:
                     zf.writestr(page[0], HEAD % dict(content=page[1]))
 
@@ -280,12 +301,15 @@ class XLIFFExporter(object):
             content = Z.read()
             Z.close()
 
-        else:                               # files as plain, so we need to join them to single_file. 
-            # one or more files to be returned directly, so we don't need the filenames
+        else:
+            # files as plain, so we need to join them to single_file.
+            # one or more files to be returned directly, so we don't need
+            # the filenames
             content = [x[1] for x in xliff_pages]
             content = "\n".join(content)
             content = HEAD % dict(content=content)
-            # Set that as it has been selected implicitly by specifying multiple files but not selecting zip
+            # Set that as it has been selected implicitly by specifying
+            # multiple files but not selecting zip
             self.single_file = True
 
         return content
@@ -310,7 +334,7 @@ class XLIFF(object):
         data = dict(original="/".join(context.getPhysicalPath()),
                     oid=context.UID(),
                     source_language=source_language,
-                    attrs="\n".join(attrs)
+                    attrs="\n".join(attrs),
                    )
 
         if html_compatibility:
@@ -322,14 +346,15 @@ class XLIFF(object):
 
 
 class BaseAttributeExtractor(object):
-    """ Adapter to retrieve attributes from a standard ITranslatable based object.
-        This should typically be used for Folders, Images, Files
+    """ Adapter to retrieve attributes from a standard ITranslatable based.
+        object. This should typically be used for Folders, Images, Files
     """
 
     implements(IAttributeExtractor)
     adapts(ITranslatable)
 
-    # If you are writing your own Extractor, inherit from this one and simply override the attrs attribute
+    # If you are writing your own Extractor, inherit from this one and simply
+    # override the attrs attribute
     attrs = ['title', 'description']
 
     def __init__(self, context):
@@ -343,7 +368,10 @@ class BaseAttributeExtractor(object):
         for key in self.attrs:
             field = schema[key]
             if field.languageIndependent:
-                logger.warn('Exporting language independent attribute %s, this may give unexpected results during import such as all language versions have the value of the last language set in the attribute!' % key)
+                logger.warn("Exporting language independent attribute %s, "
+                "this may give unexpected results during import such as all "
+                "language versions have the value of the last language set "
+                "in the attribute!" % key)
 
             value = field.get(context)
 
@@ -362,9 +390,11 @@ class BaseAttributeExtractor(object):
 def _guessLanguage(filename):
     """
     try to find a language abbreviation in the string
-    acceptable is a two letter language abbreviation at the start of the string followed by an _
+    acceptable is a two letter language abbreviation at the start of the
+    string followed by an _
     or at the end of the string prefixed by an _ just before the extension
     """
+
     def findAbbrev(id):
         if len(id) > 3 and id[2] in ['_', '-']:
             lang = id[0:2].lower()
@@ -392,34 +422,42 @@ def _guessLanguage(filename):
 
     return ''
 
+
 class DocumentAttributeExtractor(BaseAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard document based object """
+    """ Adapter to retrieve attributes from a standard document based
+    object """
     implements(IAttributeExtractor)
     adapts(IATDocument)
     attrs = ['title', 'description', 'text']
 
 
 class TopicAttributeExtractor(BaseAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard document based object """
+    """ Adapter to retrieve attributes from a standard document based
+    object """
     implements(IAttributeExtractor)
     adapts(IATTopic)
     attrs = ['title', 'description', 'text']
 
+
 class EventAttributeExtractor(BaseAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard event based object """
+    """ Adapter to retrieve attributes from a standard event based
+    object """
     implements(IAttributeExtractor)
     adapts(IATEvent)
     attrs = ['title', 'description', 'location', 'text']
 
 
 class NewsItemAttributeExtractor(BaseAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard event based object """
+    """ Adapter to retrieve attributes from a standard event based
+    object """
     implements(IAttributeExtractor)
     adapts(IATNewsItem)
     attrs = ['title', 'description', 'imageCaption', 'text']
 
+
 class LinkAttributeExtractor(BaseAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard event based object """
+    """ Adapter to retrieve attributes from a standard event based
+    object """
     implements(IAttributeExtractor)
     adapts(IATLink)
     attrs = ['title', 'description', 'remoteUrl']
@@ -429,5 +467,5 @@ class SeminarAttributeExtractor(BaseAttributeExtractor):
     """ Adapter to retrieve attributes from a seminar """
     implements(IAttributeExtractor)
     adapts(ISeminar)
-    attrs = ['title', 'description', 'location', 'summary', 'conclusions', 'furtherActions' ]
-
+    attrs = ['title', 'description', 'location', 'summary',
+        'conclusions', 'furtherActions']

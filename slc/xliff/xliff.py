@@ -172,6 +172,9 @@ class XLIFFImporter(object):
             values[fieldname] = value
 
         target_ob.processForm(data=1, metadata=1, values=values)
+        # Set the correct format
+        if shasattr(source_ob, 'text_format'):
+            target_ob.setFormat(source_ob.text_format)
 
 
 class XLIFFExporter(object):

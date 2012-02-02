@@ -9,6 +9,7 @@ from zope.app.component.hooks import getSite
 
 from Products.CMFCore.utils import getToolByName
 from Products.LinguaPlone.interfaces import ITranslatable
+from Products.Archetypes.utils import shasattr
 from Products.ATContentTypes.interface.document import IATDocument
 from Products.ATContentTypes.interface.event import IATEvent
 from Products.ATContentTypes.interface.link import IATLink

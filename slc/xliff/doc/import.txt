@@ -7,9 +7,8 @@ import the files, they know which objects they have been generated from.
 
 First we need an object which is to be translated.
 
-    >>> self.loginAsPortalOwner()
-    >>> _ = self.folder.invokeFactory('News Item', 'news_en')
-    >>> news_en = self.folder.news_en
+    >>> _ = folder.invokeFactory('News Item', 'news_en')
+    >>> news_en = folder.news_en
     >>> news_en.setTitle("My english title")
     >>> news_en.setDescription("My english description")
     >>> news_en.setImageCaption("My english imageCaption")
@@ -74,7 +73,7 @@ version and see if that worked.
     >>> news_de.Title()
     'My german Title'
     >>> news_de.Description()
-    '<p>My german Description</p>'
+    'My german Description'
     >>> news_de.getImageCaption()
     'My german imageCaption'
     >>> news_de.getText()

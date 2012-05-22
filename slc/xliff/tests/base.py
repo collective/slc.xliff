@@ -1,55 +1,55 @@
-import os, tempfile, zipfile
-from Products.Five import zcml
+from plone.app.testing import FunctionalTesting
+from plone.app.testing import IntegrationTesting
+from plone.app.testing import PLONE_FIXTURE
+from plone.app.testing import PloneSandboxLayer
+from plone.app.testing import applyProfile
+from plone.app.testing import setRoles
+from plone.app.testing import quickInstallProduct
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_NAME
+from plone.app.testing import login
+from plone.testing import z2
 from Products.Five import fiveconfigure
-from Testing import ZopeTestCase as ztc
-from StringIO import StringIO
-from Globals import package_home
 
 
-# Import PloneTestCase - this registers more products with Zope as a side effect
-from Products.PloneTestCase.PloneTestCase import PloneTestCase
-from Products.PloneTestCase.PloneTestCase import FunctionalTestCase
-from Products.PloneTestCase.PloneTestCase import setupPloneSite
-from Products.PloneTestCase.layer import onsetup, PloneSite
-from Products.PloneTestCase import layer
-from Testing import ZopeTestCase as ztc
-from Products.Five import fiveconfigure, zcml
+class SlcXliffLayer(PloneSandboxLayer):
+    defaultBases = (PLONE_FIXTURE, )
 
-
-SiteLayer = layer.PloneSite
-
-class XLIFFLayer(SiteLayer):
-    @classmethod
-    def setUp(cls):
-        """Set up additional products and ZCML required to test this product.
-        """
-        ztc.installProduct('PloneLanguageTool')
-        ztc.installProduct('LinguaPlone')
-        ztc.installProduct('ZCatalog')
+    def setUpZope(self, app, configurationContext):
+        z2.installProduct(app, 'Products.PloneLanguageTool')
+        z2.installProduct(app, 'Products.LinguaPlone')
+        z2.installProduct(app, 'Products.ZCatalog')
         fiveconfigure.debug_mode = True
         import slc.xliff
-        zcml.load_config('configure.zcml', slc.xliff)
+        self.loadZCML('configure.zcml', package=slc.xliff)
         fiveconfigure.debug_mode = False
+        import Products.LinguaPlone
+        self.loadZCML('configure.zcml', package=Products.LinguaPlone)
 
-        ztc.installPackage('slc.xliff')
-        setupPloneSite(products=['slc.xliff'])
-        SiteLayer.setUp()
+    def setUpPloneSite(self, portal):
+        quickInstallProduct(portal, 'Products.LinguaPlone')
+        applyProfile(portal, 'slc.xliff:default')
 
-class XLIFFTestCase(PloneTestCase):
-    """Base class for integration tests for the XLIFF tool.
-    """
-    layer = XLIFFLayer
+        # Login as manager and create a test folder
+        setRoles(portal, TEST_USER_ID, ['Manager'])
+        login(portal, TEST_USER_NAME)
+        portal.invokeFactory('Folder', 'folder')
 
-class XLIFFFunctionalTestCase(FunctionalTestCase):
-    """Base class for functional integration tests for the XLIFF tool.
-    """
-    layer = XLIFFLayer
-    def is_zip(self, data):
-        """ is_zipfile from zipfile needs to work on a real file object. """
-        tmpfilename = tempfile.mktemp(suffix=".zip")
-        fh = open(tmpfilename, "wb")
-        fh.write(data)
-        fh.close()
-        is_zip = zipfile.is_zipfile(tmpfilename) and zipfile.ZipFile(tmpfilename, "r")
-        os.remove(tmpfilename)
-        return is_zip
+        # Commit so that the test browser sees these objects
+        portal.portal_catalog.clearFindAndRebuild()
+        import transaction
+        transaction.commit()
+
+    def tearDownZope(self, app):
+        z2.uninstallProduct(app, 'Products.PloneLanguageTool')
+        z2.uninstallProduct(app, 'Products.LinguaPlone')
+        z2.uninstallProduct(app, 'Products.ZCatalog')
+
+
+SLC_XLIFF_FIXTURE = SlcXliffLayer()
+INTEGRATION_TESTING = IntegrationTesting(
+    bases=(SLC_XLIFF_FIXTURE,), name="SlcXliff:Integration"
+)
+FUNCTIONAL_TESTING = FunctionalTesting(
+    bases=(SLC_XLIFF_FIXTURE,), name="SlcXliff:Functional"
+)

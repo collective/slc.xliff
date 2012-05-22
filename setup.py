@@ -5,6 +5,7 @@ This module contains the  slc.xliff package
 import os
 from setuptools import setup, find_packages
 
+
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
@@ -24,15 +25,15 @@ long_description = (
     '************\n'
     + '\n' +
     read('CONTRIBUTORS.txt')
-    + '\n' 
+    + '\n'
     )
-    
-tests_require=['zope.testing', 'Products.PloneTestCase','pillow']
+
+tests_require = ['mock', 'manuel', 'plone.app.testing', 'Pillow']
 
 setup(name='slc.xliff',
       version=version,
       description="A framework to allow im and export of xliff files for translations",
-      long_description= long_description,
+      long_description=long_description,
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
         "Framework :: Plone",
@@ -61,10 +62,9 @@ setup(name='slc.xliff',
           # -*- Extra requirements: -*-
       ],
       tests_require=tests_require,
-      extras_require=dict(tests=tests_require, plone4=['Zope2']),
-      test_suite = 'slc.xliff.tests.test_docs.test_suite',
+      extras_require=dict(test=tests_require, plone4=['Zope2']),
+      test_suite='slc.xliff.tests.test_docs.test_suite',
       entry_points="""
-      # -*- entry_points -*- 
+      # -*- entry_points -*-
       """,
-      )      
-      
+      )

@@ -7,9 +7,8 @@ This xliff generator is built to run on a LinguaPlone enabled site. It can produ
 
 It assumes that all attributes on an object should be represented which are not flagged as languageIndependent. We create an object and fill it with some english content.
 
-    >>> self.loginAsPortalOwner()
-    >>> _ = self.folder.invokeFactory('Document', 'doc_en')
-    >>> doc_en = self.folder.doc_en
+    >>> _ = folder.invokeFactory('Document', 'doc_en')
+    >>> doc_en = folder.doc_en
     >>> ITranslatable.providedBy(doc_en)
     True
     >>> doc_en.setTitle("My english title")
@@ -73,7 +72,7 @@ We can also get the xliff file within a zip.
 
     >>> xliffexporter.zip = True
     >>> data = xliffexporter.export()
-    >>> zf = self.is_zip(data)
+    >>> zf = is_zip(data)
 
     >>> from zipfile import ZipFile
     >>> zf.__class__ == ZipFile
@@ -83,8 +82,8 @@ We can also get the xliff file within a zip.
     
 The zip is especially useful if we want to export recursively. Then we would receive multiple files. This is only possible inside an archive. First we set up some additional files within the folder. Recursive always means "Everything from the current folder". I recursive is called on a non folderish object, that objects parent folder is used.
 
-    >>> _ = self.folder.invokeFactory('Event', 'event_en')
-    >>> event_en = self.folder.event_en
+    >>> _ = folder.invokeFactory('Event', 'event_en')
+    >>> event_en = folder.event_en
     >>> ITranslatable.providedBy(event_en)
     True
     >>> event_en.setTitle("My english event title")
@@ -95,7 +94,7 @@ The zip is especially useful if we want to export recursively. Then we would rec
     >>> xliffexporter.recursive = True
     >>> xliffexporter.single_file = False
     >>> data = xliffexporter.export()
-    >>> zf = self.is_zip(data)
+    >>> zf = is_zip(data)
     >>> zf.__class__ == ZipFile
     True
     

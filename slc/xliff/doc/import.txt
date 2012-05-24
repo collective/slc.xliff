@@ -72,8 +72,8 @@ version and see if that worked.
     'news_en-de'
     >>> news_de.Title()
     'My german Title'
-    >>> news_de.Description()
-    'My german Description'
+    >>> 'My german Description' in news_de.Description()
+    True
     >>> news_de.getImageCaption()
     'My german imageCaption'
     >>> news_de.getText()

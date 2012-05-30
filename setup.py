@@ -65,6 +65,7 @@ setup(name='slc.xliff',
       extras_require=dict(test=tests_require, plone4=['Zope2']),
       test_suite='slc.xliff.tests.test_docs.test_suite',
       entry_points="""
-      # -*- entry_points -*-
+        [z3c.autoinclude.plugin]
+        target = plone
       """,
       )

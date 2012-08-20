@@ -404,7 +404,7 @@ def _guessLanguage(filename):
             elems = id.split('.')
             filename = ".".join(elems[:-1])
             if len(filename) > 3 and filename[-3] in ['_', '-']:
-                lang = filename[-2:].strip()
+                lang = filename[-2:].strip().lower()
                 if lang in langs:
                     return lang
             elif len(filename) == 2:

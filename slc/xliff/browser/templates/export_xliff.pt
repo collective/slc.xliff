@@ -47,7 +47,7 @@
                 <label>Expected Export Results:</label>
                 <div class="formHelp">
                     <span i18n:translate="help_currentobject">
-                        If you press export now, yo will get an xliff document on this position or subtree (if you select the recursive option):</span><br>
+                        If you press export now, you will get an xliff document on this position or subtree (if you select the recursive option):</span><br>
                   <b>Path: </b><span tal:replace="context/absolute_url" />
                 </div>
 

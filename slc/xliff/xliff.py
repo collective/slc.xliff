@@ -85,7 +85,10 @@ class XLIFFImporter(object):
                     errors.append(('File error', "Zip file corrupt?"))
                 nameList = zf.namelist()
                 for i in nameList:
-                    filelist.append((i, zf.read(i)))
+                    content = zf.read(i)
+                    if len(content) == 0:
+                        continue
+                    filelist.append((i, content)
 
             else:
                 filelist.append((filename, dataread))
@@ -116,7 +119,8 @@ class XLIFFImporter(object):
                         errors.append(('General Exception', str(e)))
                         raise e
 
-                transaction.commit()
+                # We don't do intermediate commits any more, too many ConflictErrors
+                #transaction.commit()
 
         return errors
 

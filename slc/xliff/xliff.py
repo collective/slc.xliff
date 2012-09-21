@@ -88,7 +88,7 @@ class XLIFFImporter(object):
                     content = zf.read(i)
                     if len(content) == 0:
                         continue
-                    filelist.append((i, content)
+                    filelist.append((i, content))
 
             else:
                 filelist.append((filename, dataread))

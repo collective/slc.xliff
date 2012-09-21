@@ -1,11 +1,10 @@
 slc.xliff Changelog
 ===================
 
-1.3.2 (unreleased)
+1.3.2 (2012-09-21)
 ------------------
 
-- Nothing changed yet.
-
+- Typo [thomasw]
 
 1.3.1 (2012-09-21)
 ------------------

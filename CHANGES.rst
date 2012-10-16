@@ -44,26 +44,26 @@ slc.xliff Changelog
 - Enabled epoxrt of slc.seminarportal's Seminar (thomasw)
 
 
-slc.xliff 1.1 (2009-06-19)
---------------------------
+1.1 (2009-06-19)
+----------------
 
 - code cleanup (gerken)
 
 - fixed tests (gerken)
 
-slc.xliff 1.0 (2008-03-31)
---------------------------
+1.0 (2008-03-31)
+----------------
 
 - packaged egg
 
-slc.xliff 1.0b1
----------------
+1.0b1
+-----
 
 * Added export support for IObjectManager
 * Added browser views, actions
 
-slc.xliff 1.0a1
----------------
+1.0a1
+-----
 
 * port from eITXliffTool to slc.xliff plone3 compatible
 

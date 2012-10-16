@@ -12,19 +12,11 @@ def read(*rnames):
 version = '1.3.3.dev0'
 
 long_description = (
-    read('README.txt')
+    read('README.rst')
     + '\n' +
-    read('CHANGES.txt')
+    read('CHANGES.rst')
     + '\n' +
-    'Detailed Documentation\n'
-    '**********************\n'
-    + '\n' +
-    read('slc', 'xliff', 'README.txt')
-    + '\n' +
-    'Contributors\n'
-    '************\n'
-    + '\n' +
-    read('CONTRIBUTORS.txt')
+    read('CONTRIBUTORS.rst')
     + '\n'
     )
 

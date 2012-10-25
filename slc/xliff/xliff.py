@@ -5,12 +5,14 @@ import transaction
 from types import *
 
 from Acquisition import aq_inner, aq_base
+import HTMLParser
 
 from zope.interface import implements, Interface
 from zope.component import adapts, getUtility
 from zope.app.component.hooks import getSite
 
 from Products.CMFCore.utils import getToolByName
+from Products.CMFPlone.utils import safe_unicode
 from Products.LinguaPlone.interfaces import ITranslatable
 from Products.Archetypes.utils import shasattr
 from Products.ATContentTypes.interface.document import IATDocument
@@ -27,7 +29,7 @@ except ImportError:
 
 from StringIO import StringIO
 
-from slc.xliff.BeautifulSoup import BeautifulSoup, BeautifulStoneSoup
+from slc.xliff.BeautifulSoup import BeautifulSoup
 from slc.xliff.interfaces import IXLIFFExporter, IXLIFFImporter, IXLIFF, \
     IAttributeExtractor
 
@@ -35,6 +37,7 @@ from templates.xliff import *
 from templates.html import *
 
 logger = logging.getLogger('slc.xliff')
+html_parser = HTMLParser.HTMLParser()
 
 
 class XLIFFImporter(object):
@@ -186,12 +189,8 @@ class XLIFFImporter(object):
                 continue
 
             # convert HTML entities
-            try:
-                value = unicode(BeautifulStoneSoup(value,
-                    convertEntities=BeautifulStoneSoup.HTML_ENTITIES))
-            except Exception, err:
-                print "Could not convert HTML entities on %s / %s\n\tError: "
-                "%s" % (target_ob.absolute_url(), fieldname, err)
+            value = safe_unicode(value)
+            value = html_parser.unescape(value)
             values[fieldname] = value
 
         target_ob.processForm(data=1, metadata=1, values=values)

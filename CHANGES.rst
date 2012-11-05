@@ -1,6 +1,12 @@
 slc.xliff Changelog
 ===================
 
+1.3.4 (unreleased)
+------------------
+
+- Nothing changed yet.
+
+
 1.3.3 (2012-11-05)
 ------------------
 

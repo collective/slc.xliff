@@ -1,7 +1,7 @@
 slc.xliff Changelog
 ===================
 
-1.3.3 (unreleased)
+1.3.3 (2012-11-05)
 ------------------
 
 - Bugfix in the way HTML entities were converted [thomasw]

@@ -1,3 +1,14 @@
 include *.txt
 include *.rst
 global-exclude *pyc
+
+# added by check_manifest.py
+include buildout.cfg
+recursive-include docs *.EUPL
+recursive-include docs *.GPL
+recursive-include docs *.txt
+recursive-include slc *.gif
+recursive-include slc *.pt
+recursive-include slc *.txt
+recursive-include slc *.xml
+recursive-include slc *.zcml

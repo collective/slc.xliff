@@ -9,7 +9,7 @@ import HTMLParser
 
 from zope.interface import implements, Interface
 from zope.component import adapts, getUtility
-from zope.app.component.hooks import getSite
+from zope.site.hooks import getSite
 
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import safe_unicode

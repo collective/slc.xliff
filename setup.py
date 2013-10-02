@@ -50,7 +50,7 @@ setup(name='slc.xliff',
           'z3c.autoinclude',
           'p4a.fileimage',
           'zope.component',
-          'Products.LinguaPlone',
+          'plone.app.multilingual[archetypes,dexterity]',
           # -*- Extra requirements: -*-
       ],
       tests_require=tests_require,

@@ -1,13 +1,10 @@
-from Acquisition import aq_inner, aq_base
+from Acquisition import aq_inner
 from zope.formlib import form
 from five.formlib import formbase
-from zope.interface import implements
-from zope.component import adapts, getUtility
+from zope.component import getUtility
 from DateTime import DateTime
-from Products.Five import BrowserView
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import pagetemplatefile
-from plone.multilingual.interfaces import ITranslatable
 from Products.statusmessages.interfaces import IStatusMessage
 
 

@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 import zipfile
 import logging
-import transaction
-from types import *
+from types import StringType, UnicodeType, FileType, InstanceType
 
-from Acquisition import aq_inner, aq_base
+from Acquisition import aq_inner
 import HTMLParser
 
 from zope.interface import implements, Interface
-from zope.component import adapts, getUtility
+from zope.component import adapts
 from zope.site.hooks import getSite
 
 from plone.multilingual.interfaces import ITranslationManager
@@ -35,8 +34,8 @@ from slc.xliff.BeautifulSoup import BeautifulSoup
 from slc.xliff.interfaces import IXLIFFExporter, IXLIFFImporter, IXLIFF, \
     IAttributeExtractor
 
-from templates.xliff import *
-from templates.html import *
+from templates.xliff import XLIFF_HEAD, XLIFF_FILE_BODY, XLIFF_ATTR_BODY
+from templates.html import HTML_HEAD, HTML_FILE_BODY, HTML_ATTR_BODY
 
 logger = logging.getLogger('slc.xliff')
 html_parser = HTMLParser.HTMLParser()

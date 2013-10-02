@@ -7,7 +7,7 @@ from DateTime import DateTime
 from Products.Five import BrowserView
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import pagetemplatefile
-from Products.LinguaPlone.interfaces import ITranslatable
+from plone.multilingual.interfaces import ITranslatable
 from Products.statusmessages.interfaces import IStatusMessage
 
 

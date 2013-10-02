@@ -67,7 +67,8 @@ language was set to german, a german translation  has been created and the
 translated information has been set on that. So now we can get the german 
 version and see if that worked.
 
-    >>> news_de = news_en.getTranslation('de')
+    >>> from plone.multilingual.interfaces import ITranslationManager
+    >>> news_de = ITranslationManager(news_en).get_translation('de')
     >>> news_de.getId()
     'news_en-de'
     >>> news_de.Title()
@@ -106,11 +107,11 @@ the case in real life usage :(.
     >>> xliffstr_2 = xliffstr_es + xliffstr_fi
     >>> xliffimporter.upload(xliffstr_2, html_compatibility=False)
     []
-    >>> news_es = news_en.getTranslation('es')
+    >>> news_es = ITranslationManager(news_en).get_translation('es')
     >>> news_es.Title()
     'My spanish Title'
 
-    >>> news_fi = news_en.getTranslation('fi')
+    >>> news_fi = ITranslationManager(news_en).get_translation('fi')
     >>> news_fi.Title()
     'My finnish Title'
 
@@ -138,11 +139,11 @@ spanish and finnish versions, change their text and pack them into a zip.
     >>> out = open(tempfilename, "rb")
     >>> xliffimporter.upload(out, html_compatibility=False)
     []
-    >>> news_es = news_en.getTranslation('es')
+    >>> news_es = ITranslationManager(news_en).get_translation('es')
     >>> news_es.Title()
     'My spanish zipped Title'
 
-    >>> news_fi = news_en.getTranslation('fi')
+    >>> news_fi = ITranslationManager(news_en).get_translation('fi')
     >>> news_fi.Title()
     'My finnish zipped Title'
     

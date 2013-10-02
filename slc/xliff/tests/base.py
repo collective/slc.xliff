@@ -11,23 +11,24 @@ from plone.app.testing import login
 from plone.testing import z2
 from Products.Five import fiveconfigure
 
+from plone.app.multilingual.testing import PloneAppMultilingualLayer
 
-class SlcXliffLayer(PloneSandboxLayer):
+class SlcXliffLayer(PloneAppMultilingualLayer):
     defaultBases = (PLONE_FIXTURE, )
-
+        
     def setUpZope(self, app, configurationContext):
+        PloneAppMultilingualLayer.setUpZope(self, app, configurationContext)
         z2.installProduct(app, 'Products.PloneLanguageTool')
-        z2.installProduct(app, 'Products.LinguaPlone')
         z2.installProduct(app, 'Products.ZCatalog')
+
         fiveconfigure.debug_mode = True
         import slc.xliff
         self.loadZCML('configure.zcml', package=slc.xliff)
         fiveconfigure.debug_mode = False
-        import Products.LinguaPlone
-        self.loadZCML('configure.zcml', package=Products.LinguaPlone)
 
     def setUpPloneSite(self, portal):
-        quickInstallProduct(portal, 'Products.LinguaPlone')
+        PloneAppMultilingualLayer.setUpPloneSite(self, portal)
+
         applyProfile(portal, 'slc.xliff:default')
 
         # Login as manager and create a test folder
@@ -42,7 +43,6 @@ class SlcXliffLayer(PloneSandboxLayer):
 
     def tearDownZope(self, app):
         z2.uninstallProduct(app, 'Products.PloneLanguageTool')
-        z2.uninstallProduct(app, 'Products.LinguaPlone')
         z2.uninstallProduct(app, 'Products.ZCatalog')
 
 

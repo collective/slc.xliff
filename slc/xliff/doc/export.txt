@@ -1,9 +1,9 @@
 Export
 ======
 
-This xliff generator is built to run on a LinguaPlone enabled site. It can produce an XLIFF representation of any object that implements LinguaPlone.interfaces.ITranslatable.
+This xliff generator is built to run on a plone.app.multilingual enabled site. It can produce an XLIFF representation of any object that implements plone.multilingual.interfaces.ITranslatable.
 
-    >>> from Products.LinguaPlone.interfaces import ITranslatable
+    >>> from plone.multilingual.interfaces import ITranslatable
 
 It assumes that all attributes on an object should be represented which are not flagged as languageIndependent. We create an object and fill it with some english content.
 

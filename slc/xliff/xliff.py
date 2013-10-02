@@ -11,9 +11,11 @@ from zope.interface import implements, Interface
 from zope.component import adapts, getUtility
 from zope.site.hooks import getSite
 
+from plone.multilingual.interfaces import ITranslationManager
+
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import safe_unicode
-from Products.LinguaPlone.interfaces import ITranslatable
+from plone.multilingual.interfaces import ITranslatable
 from Products.Archetypes.utils import shasattr
 from Products.ATContentTypes.interface.document import IATDocument
 from Products.ATContentTypes.interface.event import IATEvent
@@ -169,9 +171,10 @@ class XLIFFImporter(object):
                 source_language = langtool.getPreferredLanguage()
             source_ob.setLanguage(source_language)
 
-        if not source_ob.hasTranslation(target_language):
-            source_ob.addTranslation(target_language)
-        target_ob = source_ob.getTranslation(target_language)
+        tm = ITranslationManager(source_ob)
+        if not tm.has_translation(target_language):
+            tm.add_translation(target_language)
+        target_ob = tm.get_translation(target_language)
         # We dont want the id to get renamed to match the title
         target_ob.unmarkCreationFlag()
 
@@ -225,7 +228,7 @@ class XLIFFExporter(object):
         member = mtool.getAuthenticatedMember()
 
         sl = member.getProperty('shoppinglist', tuple())
-        object_provides = "Products.LinguaPlone.interfaces.ITranslatable"
+        object_provides = "plone.multilingual.interfaces.ITranslatable"
 
         results = catalog(UID=sl, object_provides=object_provides)
         SLOBs = [r.getObject() for r in results]
@@ -250,7 +253,7 @@ class XLIFFExporter(object):
         else:
             path = "/".join(ob.getPhysicalPath())
 
-        object_provides = "Products.LinguaPlone.interfaces.ITranslatable"
+        object_provides = "plone.multilingual.interfaces.ITranslatable"
         results = catalog(path=path, object_provides=object_provides)
         # make a real list out the LazyMap
         results = list(results)

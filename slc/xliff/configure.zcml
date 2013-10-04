@@ -17,6 +17,14 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
+    <genericsetup:registerProfile
+      name="testing"
+      title="XLIFF Translation Test Profile"
+      directory="profiles/testing"
+      description="Test profiles for framework to translate content using xliff"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
     <include package=".browser" />
 
     <utility factory=".xliff.XLIFFImporter" />
@@ -26,7 +34,7 @@
 
     <adapter factory=".xliff.XLIFF" />
 
-    <adapter factory=".xliff.BaseAttributeExtractor" />
+    <adapter factory=".xliff.BaseATAttributeExtractor" />
     <adapter factory=".xliff.DocumentAttributeExtractor" />
     <adapter factory=".xliff.TopicAttributeExtractor" />
     <adapter factory=".xliff.EventAttributeExtractor" />
@@ -36,5 +44,7 @@
     <configure zcml:condition="installed slc.seminarportal">
         <adapter factory=".xliff.SeminarAttributeExtractor" />
     </configure>
+
+    <adapter factory=".xliff.BaseDXAttributeExtractor" />
 
 </configure>

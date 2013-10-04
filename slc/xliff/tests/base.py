@@ -22,12 +22,14 @@ class SlcXliffLayer(PloneAppMultilingualLayer):
         fiveconfigure.debug_mode = True
         import slc.xliff
         self.loadZCML('configure.zcml', package=slc.xliff)
+        self.loadZCML('testing.zcml', package=slc.xliff)
         fiveconfigure.debug_mode = False
 
     def setUpPloneSite(self, portal):
         PloneAppMultilingualLayer.setUpPloneSite(self, portal)
 
         applyProfile(portal, 'slc.xliff:default')
+        applyProfile(portal, 'slc.xliff:testing')
 
         # Login as manager and create a test folder
         setRoles(portal, TEST_USER_ID, ['Manager'])

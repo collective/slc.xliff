@@ -1,0 +1,59 @@
+Export of Dexterity types
+=========================
+
+This xliff generator is built to run on a plone.app.multilingual enabled site. It can produce an XLIFF representation of any object that implements plone.multilingual.interfaces.ITranslatable.
+
+    >>> from plone.multilingual.interfaces import ITranslatable
+
+It assumes that all attributes on an object should be represented which are not flagged as languageIndependent. We create an object and fill it with some english content.
+
+    >>> _ = folder.invokeFactory('test_content', 'doc_en')
+    >>> doc_en = folder.doc_en
+    >>> ITranslatable.providedBy(doc_en)
+    True
+    >>> doc_en.setTitle("My english title")
+    >>> doc_en.setDescription("My english description")
+    >>> doc_en.text = "<p>My english text</p>"
+    >>> doc_en.reindexObject()
+ 
+Now we can create the xliff representation for all language dependent fields by adapting the object to IXLIFFExporter.
+
+    >>> from slc.xliff.interfaces import IXLIFFExporter
+    >>> from plone.dexterity.interfaces import IDexterityContent
+    >>> IDexterityContent.providedBy(doc_en)
+    True
+    >>> xliffexporter = IXLIFFExporter(doc_en)
+
+You can configure the export by selecting to only export the current object or you can select to export the current containers contents recursively. You can also select if you want the output displayed as one or multiple files. You can choose to export in HTML compatibility mode and whether you want to get a plaintext file or a zip download. Multiple files cannot be displayed directly in the browser, in that case all files will be shown as one instead. In this example we keep the default settings for the export. 
+
+    >>> xliffexporter.recursive = False
+    >>> xliffexporter.single_file = True
+    >>> xliffexporter.html_compatibility = False
+    >>> xliffexporter.zip = False
+    >>> xliffexporter.source_language="en"
+    >>> data = xliffexporter.export()
+
+The xliff representation stores the objects uid to find it again after translation for restore.
+
+    >>> from slc.xliff.BeautifulSoup import BeautifulSoup
+    >>> soup = BeautifulSoup(data)
+    >>> soup.findAll('file')[0]['oid'].encode('utf-8') == doc_en.UID()
+    True
+    
+Adapters are used to define the attributes to export in xliff. Let's see if all attributes of the 
+document are present in the xliff file:    
+    
+    >>> [x['id'] for x in soup.findAll('trans-unit')]
+    [u'title', u'description', u'text', u'language_independent']
+
+And of course the values that we have set before appear at the correct positions:
+
+    >>> soup.find('trans-unit', attrs={'id':'title'}).findNext('source').string.strip()
+    u'My english title'
+    
+    >>> soup.find('trans-unit', attrs={'id':'description'}).findNext('source').string.strip()
+    u'My english description'
+    
+    >>> soup.find('trans-unit', attrs={'id':'text'}).findNext('source').renderContents().strip()
+    '<p>My english text</p>'
+    

@@ -72,4 +72,5 @@ def test_suite():
     return unittest.TestSuite([
         DocFileSuite('../doc/import.txt'),
         DocFileSuite('../doc/export.txt'),
+        DocFileSuite('../doc/export_dx.txt'),
         ])

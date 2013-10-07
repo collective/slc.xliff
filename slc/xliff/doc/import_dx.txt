@@ -13,6 +13,7 @@ First we need an object which is to be translated.
     >>> doc_en.setTitle("My english title")
     >>> doc_en.setDescription("My english description")
     >>> doc_en.text = RichTextValue("<p>My english text</p>")
+    >>> doc_en.language_independent = 'This should not change.'
     >>> doc_en.reindexObject()
 
 We create a xliff document which contains translations for that from english 
@@ -75,6 +76,9 @@ version and see if that worked.
     True
     >>> doc_de.text.output
     '<p>My german Text</p>'
+    >>> doc_de.language_independent
+    'This should not change.'
+
 
 The upload contol in the management form also allows uploading many xliff 
 object translations within one file. To demonstrate that we copy the previous 
@@ -106,10 +110,14 @@ the case in real life usage :(.
     >>> doc_es = ITranslationManager(doc_en).get_translation('es')
     >>> doc_es.Title()
     'My spanish Title'
+    >>> doc_es.language_independent
+    'This should not change.'
 
     >>> doc_fi = ITranslationManager(doc_en).get_translation('fi')
     >>> doc_fi.Title()
     'My finnish Title'
+    >>> doc_fi.language_independent
+    'This should not change.'
 
 
 The upload control in the management form also allows uploading zip files 

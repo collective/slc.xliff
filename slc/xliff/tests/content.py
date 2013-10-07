@@ -1,8 +1,9 @@
 from zope import schema
 from zope.component import adapts
+from zope.interface import alsoProvides
 
 from plone.app.textfield import RichText
-from plone.multilingualbehavior import directives
+from plone.multilingualbehavior.interfaces import ILanguageIndependentField
 from plone.supermodel import model
 
 from slc.xliff import XliffMessageFactory as _
@@ -19,9 +20,10 @@ class ITestContent(model.Schema):
         title=_(u"Language Independent"),
         required=False,
     )
-    directives.languageindependent('language_independent')
+
+alsoProvides(ITestContent['language_independent'], ILanguageIndependentField)
 
 class TestContentExtractor(BaseDXAttributeExtractor):
     adapts(ITestContent)
-    attrs = ['title', 'description', 'text', 'language_independent']
+    attrs = ['title', 'description', 'text']
     

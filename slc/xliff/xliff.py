@@ -17,6 +17,7 @@ from plone.behavior.interfaces import IBehaviorAssignable
 from plone.dexterity.interfaces import IDexterityContent
 from plone.multilingual.interfaces import ITranslatable
 from plone.multilingual.interfaces import ITranslationManager
+from plone.multilingualbehavior.interfaces import ILanguageIndependentField
 
 from Products.ATContentTypes.interface.document import IATDocument
 from Products.ATContentTypes.interface.event import IATEvent
@@ -216,11 +217,17 @@ class XLIFFImporter(object):
         if IDexterityContent.providedBy(target_ob):
             # Dexterity
             schema = get_dx_schema(target_ob)
-            for k, v in values.items():
-                if k in schema:
-                    if IRichText.providedBy(schema[k]):
-                        v = RichTextValue(v)
-                    schema[k].set(target_ob, v)
+            for name, field in schema.items():
+                
+                if ILanguageIndependentField.providedBy(field):
+                    # Copy from the original:
+                    field.set(target_ob, field.get(source_ob))
+                    pass
+                elif name in values:
+                    value = values[name]
+                    if IRichText.providedBy(field):
+                        value = RichTextValue(value)
+                    schema[name].set(target_ob, value)
             
         else:
             # Archetypes
@@ -517,7 +524,6 @@ class BaseDXAttributeExtractor(object):
         self.context = aq_inner(context)
         
     def get_attrs(self, html_compatibility, source_language):
-        from plone.multilingualbehavior.interfaces import ILanguageIndependentField
         
         schema = get_dx_schema(self.context)
         attrs = []

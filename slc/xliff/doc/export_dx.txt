@@ -46,7 +46,7 @@ Adapters are used to define the attributes to export in xliff. Let's see if all 
 document are present in the xliff file:    
     
     >>> [x['id'] for x in soup.findAll('trans-unit')]
-    [u'title', u'description', u'text', u'language_independent']
+    [u'title', u'description', u'text']
 
 And of course the values that we have set before appear at the correct positions:
 

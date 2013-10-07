@@ -1,0 +1,148 @@
+Import
+======
+
+Once you get the xliff files back translated, they can be uploaded to the site 
+using the xliff import site action. Note that it doesn't matter where you 
+import the files, they know which objects they have been generated from.
+
+First we need an object which is to be translated.
+
+    >>> from plone.app.textfield.value import RichTextValue
+    >>> _ = folder.invokeFactory('test_content', 'doc_en')
+    >>> doc_en = folder.doc_en
+    >>> doc_en.setTitle("My english title")
+    >>> doc_en.setDescription("My english description")
+    >>> doc_en.text = RichTextValue("<p>My english text</p>")
+    >>> doc_en.reindexObject()
+
+We create a xliff document which contains translations for that from english 
+to german by exporting the xliff and changing its trans-unit tags to contain 
+the translation text.
+
+    >>> from slc.xliff.interfaces import IXLIFFExporter
+    >>> xliffexporter = IXLIFFExporter(doc_en)
+    >>> xliffexporter.recursive = False
+    >>> xliffexporter.single_file = True
+    >>> xliffexporter.html_compatibility = False
+    >>> xliffexporter.zip = False
+    >>> xliffexporter.source_language=doc_en.Language()
+    >>> xliffstr = xliffexporter.export()
+    
+xliffstr now contains our main english xliff version. We will reuse that in 
+the following to create different language versions for import.
+    
+    >>> from slc.xliff.BeautifulSoup import BeautifulSoup
+    >>> soup = BeautifulSoup(xliffstr)
+    >>> from slc.xliff.BeautifulSoup import NavigableString
+    >>> german_title = NavigableString(u"My german Title")
+    >>> soup.find('trans-unit', attrs={'id':'title'}).findNext('target').append( german_title )
+    >>> german_description = NavigableString(u"My german Description")
+    >>> soup.find('trans-unit', attrs={'id':'description'}).findNext('target').append( german_description )
+    >>> german_text = NavigableString(u"<p>My german Text</p>")
+    >>> soup.find('trans-unit', attrs={'id':'text'}).findNext('target').append( german_text )
+    >>> xliffstr_de = soup.prettify()
+    >>> "My german Title" in xliffstr_de
+    True
+
+While translating, we also have to change the target language attributes to 
+the target language.    
+    
+    >>> xliffstr_de = xliffstr_de.replace("<target xml:lang=\"en\">", "<target xml:lang=\"de\">")
+    >>> xliffstr_de = xliffstr_de.replace("target-language=\"\"", "target-language=\"de\"")
+
+Now we are ready to re-upload the translated file into the system. To do that 
+we need an Importer that will read our plain xliff file. Note that the 
+importer is context independent.
+
+    >>> from slc.xliff.interfaces import IXLIFFImporter
+    >>> from zope.component import getUtility
+    >>> xliffimporter = getUtility(IXLIFFImporter)
+    >>> xliffimporter.upload(xliffstr_de, html_compatibility=False)
+    []
+
+Now the changed xliff file has been set on our news item. As the target 
+language was set to german, a german translation  has been created and the 
+translated information has been set on that. So now we can get the german 
+version and see if that worked.
+
+    >>> from plone.multilingual.interfaces import ITranslationManager
+    >>> doc_de = ITranslationManager(doc_en).get_translation('de')
+    >>> doc_de.getId()
+    'doc_en-de'
+    >>> doc_de.Title()
+    'My german Title'
+    >>> 'My german Description' in doc_de.Description()
+    True
+    >>> doc_de.text.output
+    '<p>My german Text</p>'
+
+The upload contol in the management form also allows uploading many xliff 
+object translations within one file. To demonstrate that we copy the previous 
+xliff document, duplicate it and concatenate both. Note that we deliberately 
+don't care that the xliff xml header appears twice as this will probably be 
+the case in real life usage :(.
+
+    >>> soup = BeautifulSoup(xliffstr)
+    >>> spanish_title = NavigableString(u"My spanish Title")
+    >>> soup.find('trans-unit', attrs={'id':'title'}).findNext('target').append( spanish_title )
+    >>> xliffstr_es = soup.prettify()
+    >>> xliffstr_es = xliffstr_es.replace("<target xml:lang=\"en\">", "<target xml:lang=\"es\">")
+    >>> xliffstr_es = xliffstr_es.replace("target-language=\"\"", "target-language=\"es\"")
+    >>> "My spanish Title" in xliffstr_es
+    True
+
+    >>> soup = BeautifulSoup(xliffstr)
+    >>> finnish_title = NavigableString(u"My finnish Title")
+    >>> soup.find('trans-unit', attrs={'id':'title'}).findNext('target').append( finnish_title )
+    >>> xliffstr_fi = soup.prettify()
+    >>> xliffstr_fi = xliffstr_fi.replace("<target xml:lang=\"en\">", "<target xml:lang=\"fi\">")
+    >>> xliffstr_fi = xliffstr_fi.replace("target-language=\"\"", "target-language=\"fi\"")
+    >>> "My finnish Title" in xliffstr_fi
+    True
+
+    >>> xliffstr_2 = xliffstr_es + xliffstr_fi
+    >>> xliffimporter.upload(xliffstr_2, html_compatibility=False)
+    []
+    >>> doc_es = ITranslationManager(doc_en).get_translation('es')
+    >>> doc_es.Title()
+    'My spanish Title'
+
+    >>> doc_fi = ITranslationManager(doc_en).get_translation('fi')
+    >>> doc_fi.Title()
+    'My finnish Title'
+
+
+The upload control in the management form also allows uploading zip files 
+containing multiple xliff files. There is a convenience method which ignores 
+the xliff files target language attributes if a language abbrev is given as 
+prefix or postfix in the xliff filename. This is necessary currently as xliff 
+files often are not translated using a regular xliff editor. This time we will 
+also show that we can change exitsting documents. We will simply reuse the 
+spanish and finnish versions, change their text and pack them into a zip.
+
+    >>> from tempfile import mktemp
+    >>> from StringIO import StringIO
+    >>> tempfilename = mktemp(suffix='.zip')
+    >>> out = open(tempfilename, "w")
+        
+    >>> from zipfile import ZipFile
+    >>> zf = ZipFile(out, 'w')
+    >>> zf.writestr('spanish.xliff', xliffstr_es.replace('spanish', 'spanish zipped') )
+    >>> zf.writestr('finnish.xliff', xliffstr_fi.replace('finnish', 'finnish zipped') )
+    >>> zf.close()
+    >>> out.close()
+    
+    >>> out = open(tempfilename, "rb")
+    >>> xliffimporter.upload(out, html_compatibility=False)
+    []
+    >>> doc_es = ITranslationManager(doc_en).get_translation('es')
+    >>> doc_es.Title()
+    'My spanish zipped Title'
+
+    >>> doc_fi = ITranslationManager(doc_en).get_translation('fi')
+    >>> doc_fi.Title()
+    'My finnish zipped Title'
+    
+    >>> import os
+    >>> os.remove(tempfilename)
+    

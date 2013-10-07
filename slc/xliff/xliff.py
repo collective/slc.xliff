@@ -6,24 +6,27 @@ from types import StringType, UnicodeType, FileType, InstanceType
 from Acquisition import aq_inner
 import HTMLParser
 
-from zope.interface import implements, Interface
 from zope.component import adapts
+from zope.interface import implements, Interface
+from zope.schema import getFieldsInOrder
 from zope.site.hooks import getSite
 
+from plone.app.textfield.interfaces import IRichText, IRichTextValue
+from plone.app.textfield.value import RichTextValue
+from plone.behavior.interfaces import IBehaviorAssignable
+from plone.dexterity.interfaces import IDexterityContent
 from plone.multilingual.interfaces import ITranslatable
 from plone.multilingual.interfaces import ITranslationManager
 
-from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone.utils import safe_unicode
-from Products.Archetypes.interfaces import IBaseObject
-from Products.Archetypes.utils import shasattr
 from Products.ATContentTypes.interface.document import IATDocument
 from Products.ATContentTypes.interface.event import IATEvent
 from Products.ATContentTypes.interface.link import IATLink
 from Products.ATContentTypes.interface.news import IATNewsItem
 from Products.ATContentTypes.interface.topic import IATTopic
-
-from plone.dexterity.interfaces import IDexterityContent
+from Products.Archetypes.interfaces import IBaseObject
+from Products.Archetypes.utils import shasattr
+from Products.CMFCore.utils import getToolByName
+from Products.CMFPlone.utils import safe_unicode
 
 try:
     from slc.seminarportal.interfaces import ISeminar
@@ -45,6 +48,18 @@ logger = logging.getLogger('slc.xliff')
 html_parser = HTMLParser.HTMLParser()
 
 
+def get_dx_schema(context):
+    schema = dict(getFieldsInOrder(context.getTypeInfo().lookupSchema()))
+        
+    behavior_assignable = IBehaviorAssignable(context)
+    if behavior_assignable:
+        for behavior in behavior_assignable.enumerateBehaviors():
+            for k,v in getFieldsInOrder(behavior.interface):
+                schema[k] = v
+                
+    return schema        
+
+
 class XLIFFImporter(object):
     """ utility to reimport xliff translations and create/edit the respective
     objects """
@@ -57,7 +72,6 @@ class XLIFFImporter(object):
         # data maybe a zip file or a plain file.
         # A zip may contain one or more files
         # each file may contain one or more file sections
-
         filelist = []
         filetype = ''
         errors = []
@@ -154,7 +168,7 @@ class XLIFFImporter(object):
             source_ob = results[0].getObject()
         except KeyError:
             # old style xliff file. Using path
-            print "Using path to find target object"
+            #print "Using path to find target object"
             path = data['original'].encode('utf-8')
             source_ob = site.restrictedTraverse(path, None)
 
@@ -199,7 +213,18 @@ class XLIFFImporter(object):
             value = html_parser.unescape(value)
             values[fieldname] = value
 
-        target_ob.processForm(data=1, metadata=1, values=values)
+        if IDexterityContent.providedBy(target_ob):
+            # Dexterity
+            schema = get_dx_schema(target_ob)
+            for k, v in values.items():
+                if k in schema:
+                    if IRichText.providedBy(schema[k]):
+                        v = RichTextValue(v)
+                    schema[k].set(target_ob, v)
+            
+        else:
+            # Archetypes
+            target_ob.processForm(data=1, metadata=1, values=values)
         # Set the correct format
         if shasattr(source_ob, 'text_format'):
             target_ob.setFormat(source_ob.text_format)
@@ -490,25 +515,11 @@ class BaseDXAttributeExtractor(object):
 
     def __init__(self, context):
         self.context = aq_inner(context)
-
-    def _schema(self):
-        from zope.schema import getFieldsInOrder
-        from plone.behavior.interfaces import IBehaviorAssignable
-
-        schema = dict(getFieldsInOrder(self.context.getTypeInfo().lookupSchema()))
-            
-        behavior_assignable = IBehaviorAssignable(self.context)
-        if behavior_assignable:
-            for behavior in behavior_assignable.enumerateBehaviors():
-                for k,v in getFieldsInOrder(behavior.interface):
-                    schema[k] = v
-                    
-        return schema        
         
     def get_attrs(self, html_compatibility, source_language):
         from plone.multilingualbehavior.interfaces import ILanguageIndependentField
         
-        schema = self._schema()
+        schema = get_dx_schema(self.context)
         attrs = []
 
         for key in self.attrs:
@@ -522,6 +533,8 @@ class BaseDXAttributeExtractor(object):
             value = field.get(self.context)
             if isinstance(value, unicode):
                 value = value.encode('UTF-8')
+            elif IRichTextValue.providedBy(value):
+                value = value.raw
 
             data = dict(id=key,
                         value=value,

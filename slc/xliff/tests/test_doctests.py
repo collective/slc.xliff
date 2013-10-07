@@ -71,6 +71,7 @@ def DocFileSuite(testfile, flags=FLAGS, setUp=setUp, layer=FUNCTIONAL_TESTING):
 def test_suite():
     return unittest.TestSuite([
         DocFileSuite('../doc/import.txt'),
+        DocFileSuite('../doc/import_dx.txt'),
         DocFileSuite('../doc/export.txt'),
         DocFileSuite('../doc/export_dx.txt'),
         ])

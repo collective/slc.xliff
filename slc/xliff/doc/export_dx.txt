@@ -4,16 +4,18 @@ Export of Dexterity types
 This xliff generator is built to run on a plone.app.multilingual enabled site. It can produce an XLIFF representation of any object that implements plone.multilingual.interfaces.ITranslatable.
 
     >>> from plone.multilingual.interfaces import ITranslatable
+    >>> from plone.app.textfield.value import RichTextValue
 
 It assumes that all attributes on an object should be represented which are not flagged as languageIndependent. We create an object and fill it with some english content.
 
+    
     >>> _ = folder.invokeFactory('test_content', 'doc_en')
     >>> doc_en = folder.doc_en
     >>> ITranslatable.providedBy(doc_en)
     True
     >>> doc_en.setTitle("My english title")
     >>> doc_en.setDescription("My english description")
-    >>> doc_en.text = "<p>My english text</p>"
+    >>> doc_en.text = RichTextValue("<p>My english text</p>")
     >>> doc_en.reindexObject()
  
 Now we can create the xliff representation for all language dependent fields by adapting the object to IXLIFFExporter.

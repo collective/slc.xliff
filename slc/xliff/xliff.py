@@ -193,8 +193,10 @@ class XLIFFImporter(object):
         if not tm.has_translation(target_language):
             tm.add_translation(target_language)
         target_ob = tm.get_translation(target_language)
-        # We dont want the id to get renamed to match the title
-        target_ob.unmarkCreationFlag()
+        
+        if IBaseObject.providedBy(target_ob):
+            # We dont want the id to get renamed to match the title
+            target_ob.unmarkCreationFlag()
 
         values = {}
         for unit in data.findAll('trans-unit'):

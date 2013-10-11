@@ -48,7 +48,6 @@ setup(name='slc.xliff',
       install_requires=[
           'setuptools',
           'z3c.autoinclude',
-          'p4a.fileimage',
           'zope.component',
           'plone.app.multilingual[archetypes,dexterity]',
           # -*- Extra requirements: -*-

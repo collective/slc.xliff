@@ -1,7 +1,6 @@
 from zope.interface import Interface
 from zope import schema
 from slc.xliff import XliffMessageFactory as _
-from p4a.fileimage import file as p4afile
 
 class IExportParams(Interface):
     """ Management form to export xliff """
@@ -37,7 +36,8 @@ class IImportParams(Interface):
                         , required=False
                         , default=False
                         )
-    file = p4afile.FileField(title=u'Xliff file (plain or zip)', required=True)
+    
+    file = schema.Bytes(title=u'Xliff file (plain or zip)', required=True)
 
 class IXLIFFExporter(Interface):
     """ An Adapter that can create an xliff representation from objects

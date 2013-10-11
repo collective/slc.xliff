@@ -122,7 +122,7 @@ class ImportXliffForm(formbase.PageForm):
     @form.action(u'Import')
     def action_import(self, action, data):
         context = aq_inner(self.context)
-        file = self.request.get('form.file')
+        file = data['file']
         xliffimporter = getUtility(IXLIFFImporter)
         errors = xliffimporter.upload(file, html_compatibility=False)
         if errors != []:

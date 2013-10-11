@@ -4,6 +4,7 @@
 * Moved to Plone 4.3 and plone.app.multilingual (#8760)
 * Support for Dexterity (#8757, #8760)
 * Better error message if original isn't found.
+* Switched from p4a.fileimage field to a standard Bytes field for file selector.
 
 1.0b1
 -----

@@ -174,7 +174,7 @@ class XLIFFImporter(object):
             source_ob = site.restrictedTraverse(path, None)
 
         if source_ob is None:
-            return
+            raise ValueError("%s not found, can not add translation." % data['original'].encode('utf-8') )
 
         # If the source object is language-neutral, it must receive a language
         # prior to translation

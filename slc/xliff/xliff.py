@@ -314,6 +314,11 @@ class XLIFFExporter(object):
         xliff_pages = []
 
         for ob in objects:
+            # Make extra sure the object is translatable. The multilingual
+            # behavior for this type might have been deactivated without reindexing
+            # all instances of this type.
+            if not ITranslatable.providedBy(ob):
+                continue
             xob = IXLIFF(ob)
             xliff_pages.append((
                 "/".join(ob.getPhysicalPath()),

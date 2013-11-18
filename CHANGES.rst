@@ -1,10 +1,11 @@
 slc.xliff Changelog
 ===================
 
-1.3.4 (unreleased)
-------------------
+2.0 (unreleased)
+----------------
 
-- Nothing changed yet.
+Next major release will drop support for LinguaPlone
+and switch to plone.app.multilingual
 
 
 1.3.3 (2012-11-05)

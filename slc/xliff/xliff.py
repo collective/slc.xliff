@@ -51,14 +51,14 @@ html_parser = HTMLParser.HTMLParser()
 
 def get_dx_schema(context):
     schema = dict(getFieldsInOrder(context.getTypeInfo().lookupSchema()))
-        
+
     behavior_assignable = IBehaviorAssignable(context)
     if behavior_assignable:
         for behavior in behavior_assignable.enumerateBehaviors():
-            for k,v in getFieldsInOrder(behavior.interface):
+            for k, v in getFieldsInOrder(behavior.interface):
                 schema[k] = v
-                
-    return schema        
+
+    return schema
 
 
 class XLIFFImporter(object):
@@ -81,7 +81,7 @@ class XLIFFImporter(object):
             filename = 'direct_upload'
             filelist.append((filename, data))
 
-        elif type(data) in [FileType, InstanceType]: # Allow Files and StringIO
+        elif type(data) in [FileType, InstanceType]:  # Allow Files and StringIO
 
             filename = getattr(data, 'filename', 'direct_upload')
             dataread = data.read()
@@ -89,17 +89,16 @@ class XLIFFImporter(object):
             # check what type data is and reject other than text/xml
             # and application/zip
             mtr = getToolByName(site, 'mimetypes_registry')
-            mimetype = mtr.classify(dataread) #, filename=filename)
+            mimetype = mtr.classify(dataread)
 
             if mimetype.major() == 'text':
                 filetype = 'plain'
             elif mimetype.major() == 'application' and mimetype.minor() in \
-                ['zip', 'x-zip-compressed']:
+                    ['zip', 'x-zip-compressed']:
                 filetype = 'zip'
             else:
                 errors.append(('File error', "File type unknown"))
                 return errors
-
 
             if filetype == 'zip':
                 zf = zipfile.ZipFile(data, 'r')
@@ -117,25 +116,26 @@ class XLIFFImporter(object):
                 filelist.append((filename, dataread))
 
         else:
-            errors.append(('TypeError', "The xliff upload content is not of "
+            errors.append((
+                'TypeError', "The xliff upload content is not of "
                 "type plain text or zip."))
-
 
         for xliff in filelist:
             soup = BeautifulSoup(xliff[1])
             target_language = _guessLanguage(xliff[0])
             file_sections = soup.findAll('file')
             if soup.findAll('file') == []:
-                errors.append(('Empty File?', '%s contains no file sections.' \
-                % xliff[0]))
+                errors.append((
+                    'Empty File?', '%s contains no file sections.'
+                    % xliff[0]))
             dbg = 0
             for section in file_sections:
                 if dbg == 1:
                     self._setXLIFF(section, target_language=target_language)
                 else:
                     try:
-                        self._setXLIFF(section,
-                            target_language=target_language)
+                        self._setXLIFF(
+                            section, target_language=target_language)
                     except ValueError, ve:
                         errors.append(('Target Object', str(ve)))
                     except Exception, e:
@@ -174,7 +174,8 @@ class XLIFFImporter(object):
             source_ob = site.restrictedTraverse(path, None)
 
         if source_ob is None:
-            raise ValueError("%s not found, can not add translation." % data['original'].encode('utf-8') )
+            raise ValueError(
+                "%s not found, can not add translation." % data['original'].encode('utf-8'))
 
         # If the source object is language-neutral, it must receive a language
         # prior to translation
@@ -193,7 +194,7 @@ class XLIFFImporter(object):
         if not tm.has_translation(target_language):
             tm.add_translation(target_language)
         target_ob = tm.get_translation(target_language)
-        
+
         if IBaseObject.providedBy(target_ob):
             # We dont want the id to get renamed to match the title
             target_ob.unmarkCreationFlag()
@@ -220,7 +221,7 @@ class XLIFFImporter(object):
             # Dexterity
             schema = get_dx_schema(target_ob)
             for name, field in schema.items():
-                
+
                 if ILanguageIndependentField.providedBy(field):
                     # Copy from the original:
                     field.set(target_ob, field.get(source_ob))
@@ -230,7 +231,7 @@ class XLIFFImporter(object):
                     if IRichText.providedBy(field):
                         value = RichTextValue(value)
                     schema[name].set(target_ob, value)
-            
+
         else:
             # Archetypes
             target_ob.processForm(data=1, metadata=1, values=values)
@@ -269,7 +270,6 @@ class XLIFFExporter(object):
         results = catalog(UID=sl, object_provides=object_provides)
         SLOBs = [r.getObject() for r in results]
 
-
         for ob in SLOBs:
             all_obs.add(ob)
             # recursive
@@ -299,9 +299,9 @@ class XLIFFExporter(object):
         return [r.getObject() for r in results]
 
     def export(self):
-        if self.export_shoppinglist == True:
+        if self.export_shoppinglist is True:
             objects = self._getObjectsFromShoppinglist()
-        elif self.recursive == True:
+        elif self.recursive is True:
             objects = self._getObjectsByPath()
         else:
             objects = [self.context]
@@ -317,21 +317,20 @@ class XLIFFExporter(object):
             xob = IXLIFF(ob)
             xliff_pages.append((
                 "/".join(ob.getPhysicalPath()),
-                xob.render(self.html_compatibility, self.source_language),
-                ))
+                xob.render(self.html_compatibility, self.source_language),))
 
-        if self.zip == True:
+        if self.zip is True:
             Z = StringIO()
             zf = zipfile.ZipFile(Z, 'w')
 
-            if self.single_file == True:    # single file as zip
+            if self.single_file is True:    # single file as zip
                 if len(xliff_pages) == 1:
-                    zf.writestr(xliff_pages[0][0],
-                    HEAD % dict(content=xliff_pages[0][1]))
+                    zf.writestr(
+                        xliff_pages[0][0], HEAD % dict(content=xliff_pages[0][1]))
                 else:
                     data = [x[1] for x in xliff_pages]
-                    zf.writestr('export.xliff',
-                    HEAD % dict(content="\n".join(data)))
+                    zf.writestr(
+                        'export.xliff', HEAD % dict(content="\n".join(data)))
 
             # multiple files as zip
             else:
@@ -376,8 +375,7 @@ class XLIFF(object):
         data = dict(original="/".join(context.getPhysicalPath()),
                     oid=context.UID(),
                     source_language=source_language,
-                    attrs="\n".join(attrs),
-                   )
+                    attrs="\n".join(attrs),)
 
         if html_compatibility:
             filedata = HTML_FILE_BODY % data
@@ -409,10 +407,11 @@ class BaseATAttributeExtractor(object):
         for key in self.attrs:
             field = schema[key]
             if field.languageIndependent:
-                logger.warn("Exporting language independent attribute %s, "
-                "this may give unexpected results during import such as all "
-                "language versions have the value of the last language set "
-                "in the attribute!" % key)
+                logger.warn(
+                    "Exporting language independent attribute %s, "
+                    "this may give unexpected results during import such as all "
+                    "language versions have the value of the last language set "
+                    "in the attribute!" % key)
 
             value = field.get(context)
 
@@ -508,8 +507,9 @@ class SeminarAttributeExtractor(BaseATAttributeExtractor):
     """ Adapter to retrieve attributes from a seminar """
     implements(IAttributeExtractor)
     adapts(ISeminar)
-    attrs = ['title', 'description', 'location', 'summary',
-        'conclusions', 'furtherActions']
+    attrs = [
+        'title', 'description', 'location', 'summary', 'conclusions', 'furtherActions']
+
 
 class BaseDXAttributeExtractor(object):
     """ Adapter to retrieve attributes from a standard Dexterity object.
@@ -524,19 +524,20 @@ class BaseDXAttributeExtractor(object):
 
     def __init__(self, context):
         self.context = aq_inner(context)
-        
+
     def get_attrs(self, html_compatibility, source_language):
-        
+
         schema = get_dx_schema(self.context)
         attrs = []
 
         for key in self.attrs:
             field = schema[key]
             if ILanguageIndependentField.providedBy(field):
-                logger.warn("Exporting language independent attribute %s, "
-                "this may give unexpected results during import such as all "
-                "language versions have the value of the last language set "
-                "in the attribute!" % key)
+                logger.warn(
+                    "Exporting language independent attribute %s, "
+                    "this may give unexpected results during import such as all "
+                    "language versions have the value of the last language set "
+                    "in the attribute!" % key)
 
             value = field.get(self.context)
             if isinstance(value, unicode):
@@ -547,11 +548,10 @@ class BaseDXAttributeExtractor(object):
             data = dict(id=key,
                         value=value,
                         source_language=source_language)
-            
+
             if html_compatibility:
                 attrs.append(HTML_ATTR_BODY % data)
             else:
                 attrs.append(XLIFF_ATTR_BODY % data)
 
         return attrs
-

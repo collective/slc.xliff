@@ -7,11 +7,11 @@ from Acquisition import aq_inner
 import HTMLParser
 
 from zope.component import adapts
-from zope.interface import implements, Interface
+from zope.interface import implements
 from zope.schema import getFieldsInOrder
 from zope.site.hooks import getSite
 
-from plone.app.textfield.interfaces import IRichText, IRichTextValue
+from plone.app.textfield.interfaces import IRichText
 from plone.app.textfield.value import RichTextValue
 from plone.behavior.interfaces import IBehaviorAssignable
 from plone.dexterity.interfaces import IDexterityContent
@@ -19,22 +19,11 @@ from plone.multilingual.interfaces import ITranslatable
 from plone.multilingual.interfaces import ITranslationManager
 from plone.multilingualbehavior.interfaces import ILanguageIndependentField
 
-from Products.ATContentTypes.interface.document import IATDocument
-from Products.ATContentTypes.interface.event import IATEvent
-from Products.ATContentTypes.interface.link import IATLink
-from Products.ATContentTypes.interface.news import IATNewsItem
-from Products.ATContentTypes.interface.topic import IATTopic
 from Products.Archetypes.interfaces import IBaseObject
 from Products.Archetypes.utils import shasattr
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import safe_unicode
 
-try:
-    from slc.seminarportal.interfaces import ISeminar
-except ImportError:
-
-    class ISeminar(Interface):
-        """ Dummy """
 
 from StringIO import StringIO
 
@@ -42,8 +31,8 @@ from slc.xliff.BeautifulSoup import BeautifulSoup
 from slc.xliff.interfaces import IXLIFFExporter, IXLIFFImporter, IXLIFF, \
     IAttributeExtractor
 
-from templates.xliff import XLIFF_HEAD, XLIFF_FILE_BODY, XLIFF_ATTR_BODY
-from templates.html import HTML_HEAD, HTML_FILE_BODY, HTML_ATTR_BODY
+from templates.xliff import XLIFF_HEAD, XLIFF_FILE_BODY
+from templates.html import HTML_HEAD, HTML_FILE_BODY
 
 logger = logging.getLogger('slc.xliff')
 html_parser = HTMLParser.HTMLParser()
@@ -390,48 +379,6 @@ class XLIFF(object):
         return filedata
 
 
-class BaseATAttributeExtractor(object):
-    """ Adapter to retrieve attributes from a standard Archetypes object.
-    """
-
-    implements(IAttributeExtractor)
-    adapts(IBaseObject)
-
-    # If you are writing your own Extractor, inherit from this one and simply
-    # override the attrs attribute
-    attrs = ['title', 'description']
-
-    def __init__(self, context):
-        self.context = context
-
-    def get_attrs(self, html_compatibility, source_language):
-        context = aq_inner(self.context)
-        schema = context.Schema()
-        attrs = []
-
-        for key in self.attrs:
-            field = schema[key]
-            if field.languageIndependent:
-                logger.warn(
-                    "Exporting language independent attribute %s, "
-                    "this may give unexpected results during import such as all "
-                    "language versions have the value of the last language set "
-                    "in the attribute!" % key)
-
-            value = field.get(context)
-
-            data = dict(id=key,
-                        value=value,
-                        source_language=source_language)
-
-            if html_compatibility:
-                attrs.append(HTML_ATTR_BODY % data)
-            else:
-                attrs.append(XLIFF_ATTR_BODY % data)
-
-        return attrs
-
-
 def _guessLanguage(filename):
     """
     try to find a language abbreviation in the string
@@ -466,97 +413,3 @@ def _guessLanguage(filename):
         return langbyfilename
 
     return ''
-
-
-class DocumentAttributeExtractor(BaseATAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard document based
-    object """
-    implements(IAttributeExtractor)
-    adapts(IATDocument)
-    attrs = ['title', 'description', 'text']
-
-
-class TopicAttributeExtractor(BaseATAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard document based
-    object """
-    implements(IAttributeExtractor)
-    adapts(IATTopic)
-    attrs = ['title', 'description', 'text']
-
-
-class EventAttributeExtractor(BaseATAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard event based
-    object """
-    implements(IAttributeExtractor)
-    adapts(IATEvent)
-    attrs = ['title', 'description', 'location', 'text']
-
-
-class NewsItemAttributeExtractor(BaseATAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard event based
-    object """
-    implements(IAttributeExtractor)
-    adapts(IATNewsItem)
-    attrs = ['title', 'description', 'imageCaption', 'text']
-
-
-class LinkAttributeExtractor(BaseATAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard event based
-    object """
-    implements(IAttributeExtractor)
-    adapts(IATLink)
-    attrs = ['title', 'description', 'remoteUrl']
-
-
-class SeminarAttributeExtractor(BaseATAttributeExtractor):
-    """ Adapter to retrieve attributes from a seminar """
-    implements(IAttributeExtractor)
-    adapts(ISeminar)
-    attrs = [
-        'title', 'description', 'location', 'summary', 'conclusions', 'furtherActions']
-
-
-class BaseDXAttributeExtractor(object):
-    """ Adapter to retrieve attributes from a standard Dexterity object.
-    """
-
-    implements(IAttributeExtractor)
-    adapts(IDexterityContent)
-
-    # If you are writing your own Extractor, inherit from this one and simply
-    # override the attrs attribute
-    attrs = ['title', 'description']
-
-    def __init__(self, context):
-        self.context = aq_inner(context)
-
-    def get_attrs(self, html_compatibility, source_language):
-
-        schema = get_dx_schema(self.context)
-        attrs = []
-
-        for key in self.attrs:
-            field = schema[key]
-            if ILanguageIndependentField.providedBy(field):
-                logger.warn(
-                    "Exporting language independent attribute %s, "
-                    "this may give unexpected results during import such as all "
-                    "language versions have the value of the last language set "
-                    "in the attribute!" % key)
-
-            value = field.get(self.context)
-            if isinstance(value, unicode):
-                value = value.encode('UTF-8')
-            elif IRichTextValue.providedBy(value):
-                value = value.raw
-
-            data = dict(id=key,
-                        value=value,
-                        source_language=source_language)
-
-            if html_compatibility:
-                attrs.append(HTML_ATTR_BODY % data)
-            else:
-                attrs.append(XLIFF_ATTR_BODY % data)
-
-        return attrs

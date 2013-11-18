@@ -1,0 +1,22 @@
+ <configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    i18n_domain="slc.xliff">
+
+    <adapter factory=".at.BaseATAttributeExtractor" />
+    <adapter factory=".at.DocumentAttributeExtractor" />
+    <adapter factory=".at.TopicAttributeExtractor" />
+    <adapter factory=".at.EventAttributeExtractor" />
+    <adapter factory=".at.NewsItemAttributeExtractor" />
+    <adapter factory=".at.LinkAttributeExtractor" />
+
+    <adapter factory=".dx.BaseDXAttributeExtractor" />
+    <adapter factory=".dx.DocumentAttributeExtractor" />
+    <adapter factory=".dx.TopicAttributeExtractor" />
+    <adapter factory=".dx.EventAttributeExtractor" />
+    <adapter factory=".dx.NewsItemAttributeExtractor" />
+    <adapter factory=".dx.LinkAttributeExtractor" />
+
+</configure>

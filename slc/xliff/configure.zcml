@@ -26,6 +26,7 @@
       />
 
     <include package=".browser" />
+    <include package=".adapters" />
 
     <utility factory=".xliff.XLIFFImporter" />
 
@@ -34,17 +35,6 @@
 
     <adapter factory=".xliff.XLIFF" />
 
-    <adapter factory=".xliff.BaseATAttributeExtractor" />
-    <adapter factory=".xliff.DocumentAttributeExtractor" />
-    <adapter factory=".xliff.TopicAttributeExtractor" />
-    <adapter factory=".xliff.EventAttributeExtractor" />
-    <adapter factory=".xliff.NewsItemAttributeExtractor" />
-    <adapter factory=".xliff.LinkAttributeExtractor" />
 
-    <configure zcml:condition="installed slc.seminarportal">
-        <adapter factory=".xliff.SeminarAttributeExtractor" />
-    </configure>
-
-    <adapter factory=".xliff.BaseDXAttributeExtractor" />
 
 </configure>

@@ -3,7 +3,7 @@ XLIFF_HEAD = """<xliff version='1.2'
        xmlns:tal="http://xml.zope.org/namespaces/tal"
        xmlns:metal="http://xml.zope.org/namespaces/metal">
 %(content)s
-</xliff> 
+</xliff>
 """
 
 XLIFF_FILE_BODY = """<file original="%(original)s" oid="%(oid)s" source-language="%(source_language)s" target-language="">

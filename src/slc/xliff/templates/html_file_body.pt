@@ -5,7 +5,7 @@
                       target-language   options/target_language">
 <body>
 <group>
-<tal:block replace="options/attrs"></tal:block>    
+<tal:block replace="options/attrs"></tal:block>
 </group>
 </body>
 </file>

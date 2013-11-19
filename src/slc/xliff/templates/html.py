@@ -5,7 +5,7 @@ HTML_HEAD = """<html>
        xmlns:tal="http://xml.zope.org/namespaces/tal"
        xmlns:metal="http://xml.zope.org/namespaces/metal">
 %(content)s
-</xliff>        
+</xliff>
 </html>
 """
 

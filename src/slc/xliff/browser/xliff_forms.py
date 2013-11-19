@@ -7,11 +7,11 @@ from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import pagetemplatefile
 from Products.statusmessages.interfaces import IStatusMessage
 
-
 from slc.xliff.interfaces import IExportParams, IImportParams
 from slc.xliff.interfaces import IXLIFFExporter, IXLIFFImporter
 from slc.xliff import HAVE_SHOPPINGLIST, XliffMessageFactory as _
 from zope.formlib.form import setUpWidgets
+
 
 class ExportXliffForm(formbase.PageForm):
     """ Form for exporting xliff
@@ -25,7 +25,6 @@ class ExportXliffForm(formbase.PageForm):
         self.request.set('disable_border', 'on')
         return super(ExportXliffForm, self).__call__()
 
-
     def setUpWidgets(self, ignore_request=False):
         self.adapters = {}
         data = {}
@@ -38,7 +37,6 @@ class ExportXliffForm(formbase.PageForm):
 
     def have_shoppinglist(self):
         return HAVE_SHOPPINGLIST
-
 
     def shoppinglist(self):
         """ returns the titles of the items currently in the shoppinglist """

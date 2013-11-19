@@ -134,9 +134,3 @@ class ImportXliffForm(formbase.PageForm):
         self.request.response.redirect(context.absolute_url() + '/@@xliffimport')
 
         return ''
-
-
-
-
-
-

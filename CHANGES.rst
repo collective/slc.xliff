@@ -12,6 +12,7 @@ ToDo:
 * Update buildout
 * Update the tests
 * Add robot tests?
+* Get rid of slc.shoppinglist or integrate it
 
 
 1.3.3 (2012-11-05)

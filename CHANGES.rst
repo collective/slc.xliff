@@ -4,8 +4,14 @@ slc.xliff Changelog
 2.0 (unreleased)
 ----------------
 
-Next major release will drop support for LinguaPlone
-and switch to plone.app.multilingual
+This release drops support for LinguaPlone
+and switches to plone.app.multilingual.
+
+ToDo:
+
+* Update buildout
+* Update the tests
+* Add robot tests?
 
 
 1.3.3 (2012-11-05)

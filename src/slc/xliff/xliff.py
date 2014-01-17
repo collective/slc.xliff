@@ -24,7 +24,7 @@ from Products.Archetypes.utils import shasattr
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import safe_unicode
 
-
+from Globals import DevelopmentMode
 from StringIO import StringIO
 
 from slc.xliff.BeautifulSoup import BeautifulSoup
@@ -117,9 +117,9 @@ class XLIFFImporter(object):
                 errors.append((
                     'Empty File?', '%s contains no file sections.'
                     % xliff[0]))
-            dbg = 0
+
             for section in file_sections:
-                if dbg == 1:
+                if DevelopmentMode:
                     self._setXLIFF(section, target_language=target_language)
                 else:
                     try:

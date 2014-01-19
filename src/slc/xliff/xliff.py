@@ -372,31 +372,31 @@ def _guessLanguage(filename):
     acceptable is a two letter language abbreviation at the start of the
     string followed by an _
     or at the end of the string prefixed by an _ just before the extension
+    or preceded and followed by an _
     """
-
-    def findAbbrev(id):
-        if len(id) > 3 and id[2] in ['_', '-']:
-            lang = id[0:2].lower()
-            if lang in langs:
-                return lang
-        if len(id) > 3 and '.' in id:
-            elems = id.split('.')
-            filename = ".".join(elems[:-1])
-            if len(filename) > 3 and filename[-3] in ['_', '-']:
-                lang = filename[-2:].strip().lower()
-                if lang in langs:
-                    return lang
-            elif len(filename) == 2:
-                lang = filename
-                if lang in langs:
-                    return lang
 
     site = getSite()
     portal_languages = getToolByName(site, 'portal_languages')
     langs = portal_languages.getSupportedLanguages()
 
-    langbyfilename = findAbbrev(filename)
-    if langbyfilename in langs:
-        return langbyfilename
-
+    if len(filename) > 3 and filename[2] in ['_', '-']:
+        lang = filename[0:2].lower()
+        if lang in langs:
+            return lang
+    if len(filename) > 3 and '.' in filename:
+        elems = filename.split('.')
+        stem = ".".join(elems[:-1])
+        if len(stem) > 3 and stem[-3] in ['_', '-']:
+            lang = stem[-2:].strip().lower()
+            if lang in langs:
+                return lang
+        elif len(stem) == 2:
+            lang = stem.lower()
+            if lang in langs:
+                return lang
+        for elem in stem.split('_')[1:-1]:
+            if len(elem) == 2:
+                lang = elem.lower()
+            if lang in langs:
+                return lang
     return ''

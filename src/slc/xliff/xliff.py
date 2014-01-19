@@ -56,7 +56,7 @@ class XLIFFImporter(object):
 
     implements(IXLIFFImporter)
 
-    def upload(self, data, html_compatibility=False):
+    def upload(self, xliff_file, html_compatibility=False):
         """ write one or more xliff documents from a file or zip onto objects
         """
         # data maybe a zip file or a plain file.
@@ -65,49 +65,36 @@ class XLIFFImporter(object):
         filelist = []
         filetype = ''
         errors = []
-        site = getSite()
-        if type(data) in [StringType, UnicodeType]:
-            filename = 'direct_upload'
-            filelist.append((filename, data))
+        filename = xliff_file.filename
+        data = xliff_file.data
 
-        elif type(data) in [FileType, InstanceType]:  # Allow Files and StringIO
+        major, minor = xliff_file.contentType.split('/')
+        if major == 'text':
+            filetype = 'plain'
+        elif major == 'application' and minor in ['zip', 'x-zip-compressed']:
+            filetype = 'zip'
+        else:
+            errors.append(('File error', "File type unknown"))
+            return errors
 
-            filename = getattr(data, 'filename', 'direct_upload')
-            dataread = data.read()
-
-            # check what type data is and reject other than text/xml
-            # and application/zip
-            mtr = getToolByName(site, 'mimetypes_registry')
-            mimetype = mtr.classify(dataread)
-
-            if mimetype.major() == 'text':
-                filetype = 'plain'
-            elif mimetype.major() == 'application' and mimetype.minor() in \
-                    ['zip', 'x-zip-compressed']:
-                filetype = 'zip'
-            else:
-                errors.append(('File error', "File type unknown"))
-                return errors
-
-            if filetype == 'zip':
-                zf = zipfile.ZipFile(data, 'r')
-                testzip = zf.testzip()
-                if testzip:
-                    errors.append(('File error', "Zip file corrupt?"))
-                nameList = zf.namelist()
-                for i in nameList:
-                    content = zf.read(i)
-                    if len(content) == 0:
-                        continue
-                    filelist.append((i, content))
-
-            else:
-                filelist.append((filename, dataread))
+        if filetype == 'zip':
+            Z = StringIO()
+            Z.write(data)
+            zf = zipfile.ZipFile(Z, 'r')
+            testzip = zf.testzip()
+            if testzip:
+                errors.append(('File error', "Zip file corrupt?"))
+            nameList = zf.namelist()
+            for i in nameList:
+                content = zf.read(i)
+                if len(content) == 0:
+                    continue
+                filelist.append((i, content))
+            zf.close()
+            Z.close()
 
         else:
-            errors.append((
-                'TypeError', "The xliff upload content is not of "
-                "type plain text or zip."))
+            filelist.append((filename, data))
 
         for xliff in filelist:
             soup = BeautifulSoup(xliff[1])

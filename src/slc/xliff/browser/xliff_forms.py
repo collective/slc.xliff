@@ -1,6 +1,8 @@
 from Acquisition import aq_inner
 from zope.formlib import form
 from five.formlib import formbase
+from z3c.form import button
+from plone.directives import form as z3cform
 from zope.component import getUtility
 from DateTime import DateTime
 from Products.CMFCore.utils import getToolByName
@@ -104,25 +106,21 @@ class ExportXliffForm(formbase.PageForm):
         return data
 
 
-class ImportXliffForm(formbase.PageForm):
+class ImportXliffForm(z3cform.SchemaForm):
     """ Form for importing xliff
     """
-    form_fields = form.FormFields(IImportParams)
-    label = u'Import Xliff'
-    form_name = _(u"Import Xliff")
+    schema = IImportParams
+    ignoreContext = True
 
-    template = pagetemplatefile.ZopeTwoPageTemplateFile('templates/import_xliff.pt')
+    label = _(u"Import Xliff")
 
-    def __call__(self):
-        self.request.set('disable_border', True)
-        return super(ImportXliffForm, self).__call__()
-
-    @form.action(u'Import')
-    def action_import(self, action, data):
+    @button.buttonAndHandler(_(u'Import'))
+    def handleApply(self, action):
+        data, errors = self.extractData()
         context = aq_inner(self.context)
-        file = data['file']
+        xliff_file = data['xliff_file']
         xliffimporter = getUtility(IXLIFFImporter)
-        errors = xliffimporter.upload(file, html_compatibility=False)
+        errors = xliffimporter.upload(xliff_file, html_compatibility=False)
         if errors != []:
             error = ["%s: %s" % x for x in errors]
             confirm = _(u"Error while importing Xliff.\n " + "\n".join(error))

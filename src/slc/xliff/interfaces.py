@@ -1,3 +1,4 @@
+from plone.namedfile.field import NamedFile
 from zope.interface import Interface
 from zope import schema
 from slc.xliff import XliffMessageFactory as _
@@ -50,7 +51,7 @@ class IImportParams(Interface):
         default=False,
     )
 
-    file = schema.Bytes(title=u'Xliff file (plain or zip)', required=True)
+    xliff_file = NamedFile(title=u'Xliff file (plain or zip)', required=True)
 
 
 class IXLIFFExporter(Interface):

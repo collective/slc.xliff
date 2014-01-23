@@ -56,9 +56,10 @@ class XLIFFImporter(object):
 
     implements(IXLIFFImporter)
 
-    def upload(self, xliff_file, html_compatibility=False):
+    def upload(self, xliff_file, html_compatibility=False, request=None):
         """ write one or more xliff documents from a file or zip onto objects
         """
+        self.request = request
         # data maybe a zip file or a plain file.
         # A zip may contain one or more files
         # each file may contain one or more file sections
@@ -99,10 +100,10 @@ class XLIFFImporter(object):
         for xliff in filelist:
             soup = BeautifulSoup(xliff[1])
             target_language = _guessLanguage(xliff[0])
-            if target_language:
+            if target_language and self.request is not None:
                 msg = u"Detected language from file name: {0}".format(
                     target_language)
-                IStatusMessage(context.REQUEST).addStatusMessage(msg, type='info')
+                IStatusMessage(request).addStatusMessage(msg, type='info')
             file_sections = soup.findAll('file')
             if soup.findAll('file') == []:
                 errors.append((

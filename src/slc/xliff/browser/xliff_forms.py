@@ -120,7 +120,8 @@ class ImportXliffForm(z3cform.SchemaForm):
         context = aq_inner(self.context)
         xliff_file = data['xliff_file']
         xliffimporter = getUtility(IXLIFFImporter)
-        errors = xliffimporter.upload(xliff_file, html_compatibility=False)
+        errors = xliffimporter.upload(
+            xliff_file, html_compatibility=False, request=context.REQUEST)
         if errors != []:
             error = ["%s: %s" % x for x in errors]
             confirm = _(u"Error while importing Xliff.\n " + "\n".join(error))

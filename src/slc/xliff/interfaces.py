@@ -45,8 +45,9 @@ class IImportParams(Interface):
     html_compatibility = schema.Bool(
         title=u'HTML compatibility mode',
         description=_(
-            u'Select this if your files are messed up with HTML code '
-            u'in between by incorrect xlif file handling by the translators.'),
+            u'Select this option if your files are messed up with HTML code '
+            u'in between due to incorrect XLIFF file handling by the '
+            u'translators.'),
         required=False,
         default=False,
     )

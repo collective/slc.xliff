@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import zipfile
 import logging
-from types import StringType, UnicodeType, FileType, InstanceType
 
 from Acquisition import aq_inner
 import HTMLParser
@@ -23,6 +22,7 @@ from Products.Archetypes.interfaces import IBaseObject
 from Products.Archetypes.utils import shasattr
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import safe_unicode
+from Products.statusmessages.interfaces import IStatusMessage
 
 from Globals import DevelopmentMode
 from StringIO import StringIO
@@ -99,6 +99,10 @@ class XLIFFImporter(object):
         for xliff in filelist:
             soup = BeautifulSoup(xliff[1])
             target_language = _guessLanguage(xliff[0])
+            if target_language:
+                msg = u"Detected language from file name: {0}".format(
+                    target_language)
+                IStatusMessage(context.REQUEST).addStatusMessage(msg, type='info')
             file_sections = soup.findAll('file')
             if soup.findAll('file') == []:
                 errors.append((

@@ -66,6 +66,8 @@ class XLIFFImporter(object):
         filelist = []
         filetype = ''
         errors = []
+        self.total = 0
+        self.new_translations = 0
         filename = xliff_file.filename
         data = xliff_file.data
 
@@ -103,7 +105,7 @@ class XLIFFImporter(object):
             if target_language and self.request is not None:
                 msg = u"Detected language from file name: {0}".format(
                     target_language)
-                IStatusMessage(request).addStatusMessage(msg, type='info')
+                IStatusMessage(self.request).addStatusMessage(msg, type='info')
             file_sections = soup.findAll('file')
             if soup.findAll('file') == []:
                 errors.append((
@@ -125,7 +127,10 @@ class XLIFFImporter(object):
 
                 # We don't do intermediate commits any more, too many ConflictErrors
                 #transaction.commit()
-
+            if self.request is not None:
+                msg = u"Handled a total of {0} files, of which {1} were new translations".format(
+                    self.total, self.new_translations)
+                IStatusMessage(self.request).addStatusMessage(msg, type='info')
         return errors
 
     def _setXLIFF(self, data, target_language=''):
@@ -174,6 +179,7 @@ class XLIFFImporter(object):
         tm = ITranslationManager(source_ob)
         if not tm.has_translation(target_language):
             tm.add_translation(target_language)
+            self.new_translations += 1
         target_ob = tm.get_translation(target_language)
 
         if IBaseObject.providedBy(target_ob):
@@ -219,6 +225,7 @@ class XLIFFImporter(object):
         # Set the correct format
         if shasattr(source_ob, 'text_format'):
             target_ob.setFormat(source_ob.text_format)
+        self.total += 1
 
 
 class XLIFFExporter(object):

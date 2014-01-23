@@ -7,7 +7,8 @@ from plone.multilingualbehavior.interfaces import ILanguageIndependentField
 from plone.supermodel import model
 
 from slc.xliff import XliffMessageFactory as _
-from slc.xliff.xliff import BaseDXAttributeExtractor
+from slc.xliff.adapters.dx import BaseDXAttributeExtractor
+
 
 class ITestContent(model.Schema):
 
@@ -23,7 +24,7 @@ class ITestContent(model.Schema):
 
 alsoProvides(ITestContent['language_independent'], ILanguageIndependentField)
 
+
 class TestContentExtractor(BaseDXAttributeExtractor):
     adapts(ITestContent)
     attrs = ['title', 'description', 'text']
-    

@@ -1,18 +1,15 @@
 slc.xliff Changelog
 ===================
 
-2.0 (unreleased)
-----------------
+2.0b1 (unreleased)
+------------------
 
 This release drops support for LinguaPlone
 and switches to plone.app.multilingual.
 
-ToDo:
+Todo:
 
-* Update buildout
-* Update the tests
-* Add robot tests?
-* Get rid of slc.shoppinglist or integrate it
+- get rid of all references to slc.shoppinglist
 
 
 1.3.3 (2012-11-05)

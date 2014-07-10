@@ -1,7 +1,7 @@
 slc.xliff Changelog
 ===================
 
-2.0b1 (unreleased)
+2.0b1 (2014-07-10)
 ------------------
 
 This release drops support for LinguaPlone

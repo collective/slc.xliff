@@ -1,7 +1,7 @@
 slc.xliff Changelog
 ===================
 
-2.0b2 (unreleased)
+2.0b2 (2014-10-20)
 ------------------
 
 - Bugfix in _guessLanguage

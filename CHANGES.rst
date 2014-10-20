@@ -1,6 +1,12 @@
 slc.xliff Changelog
 ===================
 
+2.0b3 (unreleased)
+------------------
+
+- Nothing changed yet.
+
+
 2.0b2 (2014-10-20)
 ------------------
 

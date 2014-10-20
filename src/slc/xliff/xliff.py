@@ -409,6 +409,6 @@ def _guessLanguage(filename):
         for elem in stem.split('_')[1:-1]:
             if len(elem) == 2:
                 lang = elem.lower()
-            if lang in langs:
-                return lang
+                if lang in langs:
+                    return lang
     return ''

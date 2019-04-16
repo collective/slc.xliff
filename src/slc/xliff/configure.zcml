@@ -18,6 +18,14 @@
       />
 
     <genericsetup:registerProfile
+      name="uninstall"
+      title="XLIFF Translation Support (uninstall)"
+      directory="profiles/uninstall"
+      description="Framework to translate content using xliff (uninstall)"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+    <genericsetup:registerProfile
       name="testing"
       title="XLIFF Translation Test Profile"
       directory="profiles/testing"

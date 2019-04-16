@@ -3,7 +3,7 @@ from zope.component import adapts
 from zope.interface import alsoProvides
 
 from plone.app.textfield import RichText
-from plone.multilingualbehavior.interfaces import ILanguageIndependentField
+from plone.app.multilingual.dx.interfaces import ILanguageIndependentField
 from plone.supermodel import model
 
 from slc.xliff import XliffMessageFactory as _

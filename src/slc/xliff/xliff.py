@@ -180,10 +180,6 @@ class XLIFFImporter(object):
             self.new_translations += 1
         target_ob = tm.get_translation(target_language)
 
-        if IBaseObject.providedBy(target_ob):
-            # We dont want the id to get renamed to match the title
-            target_ob.unmarkCreationFlag()
-
         values = {}
         for unit in data.findAll('trans-unit'):
 
@@ -217,12 +213,6 @@ class XLIFFImporter(object):
                         value = RichTextValue(value)
                     schema[name].set(target_ob, value)
 
-        else:
-            # Archetypes
-            target_ob.processForm(data=1, metadata=1, values=values)
-        # Set the correct format
-        if shasattr(source_ob, 'text_format'):
-            target_ob.setFormat(source_ob.text_format)
         self.total += 1
 
 

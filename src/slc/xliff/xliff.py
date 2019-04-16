@@ -53,7 +53,6 @@ class XLIFFImporter(object):
     """ utility to reimport xliff translations and create/edit the respective
     objects """
 
-
     def upload(self, xliff_file, html_compatibility=False, request=None):
         """ write one or more xliff documents from a file or zip onto objects
         """
@@ -134,18 +133,18 @@ class XLIFFImporter(object):
     def _setXLIFF(self, data, target_language=''):
         """ Set the data on one object """
         site = getSite()
-        uid_catalog = getToolByName(site, 'uid_catalog')
+        portal_catalog = getToolByName(site, 'portal_catalog')
 
         if target_language == '':
-            target_language = data['target-language'].encode('ascii')
+            target_language = data['target-language']
 
         # nothing to do if there is no target language
         if not target_language:
             return
 
         try:
-            oid = data['oid'].encode('ascii')
-            results = uid_catalog(UID=oid)
+            oid = data['oid']
+            results = portal_catalog(UID=oid)
             if len(results) != 1:
                 #raise ValueError, "Uid catalog should return exactly one
                 #result but returned %s." % len(results)
@@ -154,12 +153,12 @@ class XLIFFImporter(object):
         except KeyError:
             # old style xliff file. Using path
             #print "Using path to find target object"
-            path = data['original'].encode('utf-8')
+            path = data['original']
             source_ob = site.restrictedTraverse(path, None)
 
         if source_ob is None:
             raise ValueError(
-                "%s not found, can not add translation." % data['original'].encode('utf-8'))
+                "%s not found, can not add translation." % data['original'])
 
         # If the source object is language-neutral, it must receive a language
         # prior to translation
@@ -181,9 +180,10 @@ class XLIFFImporter(object):
         target_ob = tm.get_translation(target_language)
 
         values = {}
+
         for unit in data.findAll('trans-unit'):
 
-            fieldname = unit['id'].encode('utf-8')
+            fieldname = unit['id']
             value = unit.find('target').renderContents('utf-8').strip()
 
             # Note: We don't use xliff to remove values, so no value means no
@@ -210,7 +210,9 @@ class XLIFFImporter(object):
                 elif name in values:
                     value = values[name]
                     if IRichText.providedBy(field):
-                        value = RichTextValue(value)
+                        mimeType = getattr(source_ob, name).mimeType
+                        outputMimeType = getattr(source_ob, name).outputMimeType
+                        value = RichTextValue(value, mimeType, outputMimeType)
                     schema[name].set(target_ob, value)
 
         self.total += 1
@@ -219,7 +221,6 @@ class XLIFFImporter(object):
 @implementer(IXLIFFExporter)
 class XLIFFExporter(object):
     """ Adapter to generate an xliff representation from a content object """
-
 
     recursive = False
     single_file = True
@@ -270,7 +271,8 @@ class XLIFFExporter(object):
         # make a real list out the LazyMap
         results = list(results)
         # sort by path, so that top-level object will get translated first
-        results.sort(lambda x, y: cmp(len(x.getPath()), len(y.getPath())))
+
+        results.sort(key=lambda x: len(x.getPath().split('/')))
 
         return [r.getObject() for r in results]
 
@@ -341,7 +343,6 @@ class XLIFFExporter(object):
 @implementer(IXLIFF)
 class XLIFF(object):
     """ """
-
 
     def __init__(self, context):
         self.context = context

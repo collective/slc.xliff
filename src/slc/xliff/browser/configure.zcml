@@ -30,6 +30,7 @@
         />
 
     <browser:page
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
         name="xliffimport"
         permission="cmf.ModifyPortalContent"
         class=".xliff_forms.ImportXliffForm"

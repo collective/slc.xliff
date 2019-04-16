@@ -4,8 +4,17 @@ slc.xliff Changelog
 3.0b3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Changes to support python3 and Plone 5.2
+  [erral]
 
+- Convert doctests to standard tests
+  [erral]
+
+- Remove Archetypes support
+  [erral]
+
+- Remove slc.shoppinglist support
+  [erral]
 
 2.0b2 (2014-10-20)
 ------------------
@@ -87,5 +96,3 @@ Todo:
 -----
 
 * port from eITXliffTool to slc.xliff plone3 compatible
-
-

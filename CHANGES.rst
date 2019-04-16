@@ -1,7 +1,7 @@
 slc.xliff Changelog
 ===================
 
-2.0b3 (unreleased)
+3.0b3 (unreleased)
 ------------------
 
 - Nothing changed yet.

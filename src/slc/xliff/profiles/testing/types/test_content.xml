@@ -25,7 +25,7 @@
   <element value="plone.app.dexterity.behaviors.metadata.IDublinCore"/>
   <element value="plone.app.content.interfaces.INameFromTitle"/>
   <element
-     value="plone.multilingualbehavior.interfaces.IDexterityTranslatable"/>
+     value="plone.app.multilingual.dx.interfaces.IDexterityTranslatable"/>
  </property>
  <property name="schema">slc.xliff.tests.content.ITestContent</property>
  <property name="model_file"></property>

@@ -1,24 +1,25 @@
 from Acquisition import aq_inner
-from zope.formlib import form
-from five.formlib import formbase
-from z3c.form import button
-from plone.directives import form as z3cform
-from zope.component import getUtility
 from DateTime import DateTime
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import pagetemplatefile
 from Products.statusmessages.interfaces import IStatusMessage
+from slc.xliff import HAVE_SHOPPINGLIST
+from slc.xliff import XliffMessageFactory as _
+from slc.xliff.interfaces import IExportParams
+from slc.xliff.interfaces import IImportParams
+from slc.xliff.interfaces import IXLIFFExporter
+from slc.xliff.interfaces import IXLIFFImporter
+from z3c.form import button
+from z3c.form import field
+from z3c.form import form
+from zope.component import getUtility
 
-from slc.xliff.interfaces import IExportParams, IImportParams
-from slc.xliff.interfaces import IXLIFFExporter, IXLIFFImporter
-from slc.xliff import HAVE_SHOPPINGLIST, XliffMessageFactory as _
-from zope.formlib.form import setUpWidgets
 
-
-class ExportXliffForm(formbase.PageForm):
+class ExportXliffForm(form.Form):
     """ Form for exporting xliff
     """
-    form_fields = form.FormFields(IExportParams)
+    fields = field.Fields(IExportParams)
+    ignoreContext = True
     label = u'Export Xliff'
     form_name = _(u"Export Xliff")
     template = pagetemplatefile.ZopeTwoPageTemplateFile('templates/export_xliff.pt')
@@ -56,15 +57,17 @@ class ExportXliffForm(formbase.PageForm):
 
         return mylist
 
-    @form.action(u'Export')
-    def action_export(self, action, data):
+    @button.buttonAndHandler(u'Export')
+    def action_export(self, action):
         context = aq_inner(self.context)
+        data, errors = self.extractData()
 
-        recursive = not not self.request.get('form.recursive')
-        single_file = not not self.request.get('form.single_file')
-        zip = not not self.request.get('form.zip')
-        html_compatibility = not not self.request.get('form.html_compatibility')
-        export_shoppinglist = not not self.request.get('form.export_shoppinglist')
+        recursive = bool(data.get('recursive'))
+        single_file = bool(data.get('single_file'))
+        zip = bool(data.get('zip'))
+        html_compatibility = bool(data.get('html_copmpatibility'))
+        # XXX
+        export_shoppinglist = bool(data.get('export_shoppinglist'))
 
         if self.context.isPrincipiaFolderish:
             container = context
@@ -102,14 +105,14 @@ class ExportXliffForm(formbase.PageForm):
                                             'attachment; filename=%s.xliff' % context.getId())
         else:
             pass    # Should not happen
+        self.request.response.write(data)
+        return self.request.response
 
-        return data
 
-
-class ImportXliffForm(z3cform.SchemaForm):
+class ImportXliffForm(form.Form):
     """ Form for importing xliff
     """
-    schema = IImportParams
+    fields = field.Fields(IImportParams)
     ignoreContext = True
 
     label = _(u"Import Xliff")

@@ -1,41 +1,39 @@
 # -*- coding: utf-8 -*-
-import zipfile
-import logging
-
 from Acquisition import aq_inner
-import HTMLParser
-
-from zope.component import adapts
-from zope.interface import implements
-from zope.schema import getFieldsInOrder
-from zope.site.hooks import getSite
-
+from bs4 import BeautifulSoup
+from plone import api
+from plone.app.multilingual.dx.interfaces import ILanguageIndependentField
+from plone.app.multilingual.interfaces import ITranslatable
+from plone.app.multilingual.interfaces import ITranslationManager
 from plone.app.textfield.interfaces import IRichText
 from plone.app.textfield.value import RichTextValue
 from plone.behavior.interfaces import IBehaviorAssignable
 from plone.dexterity.interfaces import IDexterityContent
-from plone.multilingual.interfaces import ITranslatable
-from plone.multilingual.interfaces import ITranslationManager
-from plone.multilingualbehavior.interfaces import ILanguageIndependentField
-
-from Products.Archetypes.interfaces import IBaseObject
-from Products.Archetypes.utils import shasattr
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import safe_unicode
 from Products.statusmessages.interfaces import IStatusMessage
+from six import BytesIO
+from six import StringIO
+from slc.xliff.interfaces import IAttributeExtractor
+from slc.xliff.interfaces import IXLIFF
+from slc.xliff.interfaces import IXLIFFExporter
+from slc.xliff.interfaces import IXLIFFImporter
+from slc.xliff.templates.html import HTML_FILE_BODY
+from slc.xliff.templates.html import HTML_HEAD
+from slc.xliff.templates.xliff import XLIFF_FILE_BODY
+from slc.xliff.templates.xliff import XLIFF_HEAD
+from zope.component import adapter
+from zope.interface import implementer
+from zope.schema import getFieldsInOrder
+from zope.site.hooks import getSite
 
-from Globals import DevelopmentMode
-from StringIO import StringIO
+import logging
+import six.moves.html_parser
+import zipfile
 
-from slc.xliff.BeautifulSoup import BeautifulSoup
-from slc.xliff.interfaces import IXLIFFExporter, IXLIFFImporter, IXLIFF, \
-    IAttributeExtractor
-
-from templates.xliff import XLIFF_HEAD, XLIFF_FILE_BODY
-from templates.html import HTML_HEAD, HTML_FILE_BODY
 
 logger = logging.getLogger('slc.xliff')
-html_parser = HTMLParser.HTMLParser()
+html_parser = six.moves.html_parser.HTMLParser()
 
 
 def get_dx_schema(context):
@@ -50,11 +48,11 @@ def get_dx_schema(context):
     return schema
 
 
+@implementer(IXLIFFImporter)
 class XLIFFImporter(object):
     """ utility to reimport xliff translations and create/edit the respective
     objects """
 
-    implements(IXLIFFImporter)
 
     def upload(self, xliff_file, html_compatibility=False, request=None):
         """ write one or more xliff documents from a file or zip onto objects
@@ -81,7 +79,7 @@ class XLIFFImporter(object):
             return errors
 
         if filetype == 'zip':
-            Z = StringIO()
+            Z = BytesIO()
             Z.write(data)
             zf = zipfile.ZipFile(Z, 'r')
             testzip = zf.testzip()
@@ -113,15 +111,15 @@ class XLIFFImporter(object):
                     % xliff[0]))
 
             for section in file_sections:
-                if DevelopmentMode:
+                if api.env.debug_mode():
                     self._setXLIFF(section, target_language=target_language)
                 else:
                     try:
                         self._setXLIFF(
                             section, target_language=target_language)
-                    except ValueError, ve:
+                    except ValueError as ve:
                         errors.append(('Target Object', str(ve)))
-                    except Exception, e:
+                    except Exception as e:
                         errors.append(('General Exception', str(e)))
                         raise e
 
@@ -151,7 +149,7 @@ class XLIFFImporter(object):
             if len(results) != 1:
                 #raise ValueError, "Uid catalog should return exactly one
                 #result but returned %s." % len(results)
-                raise KeyError, "Invalid OID %s" % oid
+                raise KeyError("Invalid OID %s" % oid)
             source_ob = results[0].getObject()
         except KeyError:
             # old style xliff file. Using path
@@ -228,10 +226,10 @@ class XLIFFImporter(object):
         self.total += 1
 
 
+@implementer(IXLIFFExporter)
 class XLIFFExporter(object):
     """ Adapter to generate an xliff representation from a content object """
 
-    implements(IXLIFFExporter)
 
     recursive = False
     single_file = True
@@ -277,7 +275,7 @@ class XLIFFExporter(object):
         else:
             path = "/".join(ob.getPhysicalPath())
 
-        object_provides = "plone.multilingual.interfaces.ITranslatable"
+        object_provides = "plone.app.multilingual.interfaces.ITranslatable"
         results = catalog(path=path, object_provides=object_provides)
         # make a real list out the LazyMap
         results = list(results)
@@ -313,7 +311,7 @@ class XLIFFExporter(object):
                 xob.render(self.html_compatibility, self.source_language),))
 
         if self.zip is True:
-            Z = StringIO()
+            Z = BytesIO()
             zf = zipfile.ZipFile(Z, 'w')
 
             if self.single_file is True:    # single file as zip
@@ -349,11 +347,11 @@ class XLIFFExporter(object):
         return content
 
 
+@adapter(ITranslatable)
+@implementer(IXLIFF)
 class XLIFF(object):
     """ """
 
-    adapts(ITranslatable)
-    implements(IXLIFF)
 
     def __init__(self, context):
         self.context = context

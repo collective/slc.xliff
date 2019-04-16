@@ -1,30 +1,31 @@
 # -*- coding: utf-8 -*-
 
 from Acquisition import aq_inner
-from plone.dexterity.interfaces import IDexterityContent
 from plone.app.contenttypes.interfaces import ICollection
 from plone.app.contenttypes.interfaces import IDocument
-from plone.app.contenttypes.interfaces import INewsItem
 from plone.app.contenttypes.interfaces import IEvent
 from plone.app.contenttypes.interfaces import ILink
+from plone.app.contenttypes.interfaces import INewsItem
+from plone.app.multilingual.dx.interfaces import ILanguageIndependentField
 from plone.app.textfield.interfaces import IRichTextValue
-from plone.multilingualbehavior.interfaces import ILanguageIndependentField
+from plone.dexterity.interfaces import IDexterityContent
 from slc.xliff.interfaces import IAttributeExtractor
-from slc.xliff.xliff import get_dx_schema
-from slc.xliff.templates.xliff import XLIFF_ATTR_BODY
 from slc.xliff.templates.html import HTML_ATTR_BODY
-from zope.component import adapts
-from zope.interface import implements
-
+from slc.xliff.templates.xliff import XLIFF_ATTR_BODY
+from slc.xliff.xliff import get_dx_schema
 from slc.xliff.xliff import logger
+from zope.component import adapter
+from zope.interface import implementer
+import six
 
 
+
+@implementer(IAttributeExtractor)
+@adapter(IDexterityContent)
 class BaseDXAttributeExtractor(object):
     """ Adapter to retrieve attributes from a standard Dexterity object.
     """
 
-    implements(IAttributeExtractor)
-    adapts(IDexterityContent)
 
     # If you are writing your own Extractor, inherit from this one and simply
     # override the attrs attribute
@@ -50,7 +51,7 @@ class BaseDXAttributeExtractor(object):
             value = field.get(self.context)
             if IRichTextValue.providedBy(value):
                 value = value.raw
-            if isinstance(value, unicode):
+            if isinstance(value, six.text_type):
                 value = value.encode('UTF-8')
 
             data = dict(id=key,
@@ -65,41 +66,41 @@ class BaseDXAttributeExtractor(object):
         return attrs
 
 
+@implementer(IAttributeExtractor)
+@adapter(IDocument)
 class DocumentAttributeExtractor(BaseDXAttributeExtractor):
     """ Adapter to retrieve attributes from a standard document based
     object """
-    implements(IAttributeExtractor)
-    adapts(IDocument)
     attrs = ['title', 'description', 'text']
 
 
+@implementer(IAttributeExtractor)
+@adapter(ICollection)
 class TopicAttributeExtractor(BaseDXAttributeExtractor):
     """ Adapter to retrieve attributes from a standard document based
     object """
-    implements(IAttributeExtractor)
-    adapts(ICollection)
     attrs = ['title', 'description', 'text']
 
 
+@implementer(IAttributeExtractor)
+@adapter(IEvent)
 class EventAttributeExtractor(BaseDXAttributeExtractor):
     """ Adapter to retrieve attributes from a standard event based
     object """
-    implements(IAttributeExtractor)
-    adapts(IEvent)
     attrs = ['title', 'description', 'location', 'text']
 
 
+@implementer(IAttributeExtractor)
+@adapter(INewsItem)
 class NewsItemAttributeExtractor(BaseDXAttributeExtractor):
     """ Adapter to retrieve attributes from a standard event based
     object """
-    implements(IAttributeExtractor)
-    adapts(INewsItem)
     attrs = ['title', 'description', 'imageCaption', 'text']
 
 
+@implementer(IAttributeExtractor)
+@adapter(ILink)
 class LinkAttributeExtractor(BaseDXAttributeExtractor):
     """ Adapter to retrieve attributes from a standard event based
     object """
-    implements(IAttributeExtractor)
-    adapts(ILink)
     attrs = ['title', 'description', 'remoteUrl']

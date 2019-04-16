@@ -1,8 +1,13 @@
+# -*- coding: utf-8 -*-
 from plone.namedfile.field import NamedFile
 from zope.interface import Interface
 from zope import schema
 from slc.xliff import XliffMessageFactory as _
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
+
+class ISlcXliff(IDefaultBrowserLayer):
+    """Marker interface that defines a browser layer."""
 
 class IExportParams(Interface):
     """ Management form to export xliff """

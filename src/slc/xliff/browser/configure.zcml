@@ -6,16 +6,19 @@
     <browser:resource
         name="xliff_success_icon.gif"
         image="templates/success_icon.gif"
+        layer="..interfaces.ISlcXliff"
         />
 
     <browser:resource
         name="xliff_failure_icon.gif"
         image="templates/failure_icon.gif"
+        layer="..interfaces.ISlcXliff"
         />
 
     <browser:resource
         name="xliff_icon.gif"
         image="templates/xliff_icon.gif"
+        layer="..interfaces.ISlcXliff"
         />
 
     <browser:page
@@ -23,13 +26,14 @@
         name="xliffexport"
         permission="cmf.ModifyPortalContent"
         class=".xliff_forms.ExportXliffForm"
+        layer="..interfaces.ISlcXliff"
         />
 
     <browser:page
-        for="*"
         name="xliffimport"
         permission="cmf.ModifyPortalContent"
         class=".xliff_forms.ImportXliffForm"
+        layer="..interfaces.ISlcXliff"
         />
 
 </configure>

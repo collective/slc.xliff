@@ -137,7 +137,7 @@ class TestXliffImport(unittest.TestCase):
 
         xliffimporter = getUtility(IXLIFFImporter)
         xliff_file = NamedFile(
-            data=xliffstr_de, contentType="text/xml", filename="transl_de.xliff"
+            data=xliffstr_de, contentType="text/xml", filename=u"transl_de.xliff"
         )
 
         xliffimporter.upload(xliff_file, html_compatibility=False)
@@ -172,7 +172,7 @@ class TestXliffImport(unittest.TestCase):
         xliff_file = NamedFile(
             data=xliffstr_translations,
             contentType="text/xml",
-            filename="transl_mixed.xliff",
+            filename=u"transl_mixed.xliff",
         )
 
         xliffimporter.upload(xliff_file, html_compatibility=False)
@@ -203,10 +203,10 @@ class TestXliffImport(unittest.TestCase):
         xliffstr = xliffexporter.export()
 
         soup_es = BeautifulSoup(xliffstr, "xml")
-        xliffstr_es = prepare_contents_in_language(soup_es, "es", "spanish zipped")
+        xliffstr_es = prepare_contents_in_language(soup_es, "es", u"spanish zipped")
 
         soup_fi = BeautifulSoup(xliffstr, "xml")
-        xliffstr_fi = prepare_contents_in_language(soup_fi, "fi", "finnish zipped")
+        xliffstr_fi = prepare_contents_in_language(soup_fi, "fi", u"finnish zipped")
 
         tempfilename = mktemp(suffix=".zip")
         with open(tempfilename, "wb") as out:

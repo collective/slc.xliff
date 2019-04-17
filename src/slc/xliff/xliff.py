@@ -283,7 +283,7 @@ class XLIFFExporter(object):
             if self.single_file is True:    # single file as zip
                 if len(xliff_pages) == 1:
                     zf.writestr(
-                        xliff_pages[0][0], HEAD % dict(content=xliff_pages[0][1]))
+                        '%.xliff' % xliff_pages[0][0], HEAD % dict(content=xliff_pages[0][1]))
                 else:
                     data = [x[1] for x in xliff_pages]
                     zf.writestr(

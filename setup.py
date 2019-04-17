@@ -20,7 +20,7 @@ long_description = (
     + '\n'
     )
 
-tests_require = ['mock', 'manuel', 'plone.app.testing', 'Pillow', 'plone.testing>=5.0.0', 'plone.app.robotframework[debug]', 'plone.app.contenttypes']
+tests_require = ['mock', 'manuel', 'plone.app.testing', 'Pillow', 'plone.testing', 'plone.app.robotframework[debug]', 'plone.app.contenttypes']
 
 setup(name='slc.xliff',
       version=version,

@@ -292,7 +292,7 @@ class XLIFFExporter(object):
             # multiple files as zip
             else:
                 for page in xliff_pages:
-                    zf.writestr(page[0], HEAD % dict(content=page[1]))
+                    zf.writestr('%.xliff' % page[0], HEAD % dict(content=page[1]))
 
             zf.close()
             Z.seek(0)

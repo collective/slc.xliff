@@ -1,11 +1,5 @@
 from zope.i18nmessageid import MessageFactory
 
-try:
-    import slc.shoppinglist
-    HAVE_SHOPPINGLIST = True
-except:
-    HAVE_SHOPPINGLIST = False
-
 XliffMessageFactory = MessageFactory('slc.xliff')
 
 

@@ -227,33 +227,9 @@ class XLIFFExporter(object):
     html_compatibility = False
     zip = False
     source_language = "en"
-    export_shoppinglist = False
-    shoppinglist = list()
 
     def __init__(self, context):
         self.context = context
-
-    def _getObjectsFromShoppinglist(self):
-        context = aq_inner(self.context)
-        all_obs = set()
-
-        catalog = getToolByName(context, 'portal_catalog')
-        mtool = getToolByName(context, 'portal_membership')
-        member = mtool.getAuthenticatedMember()
-
-        sl = member.getProperty('shoppinglist', tuple())
-        object_provides = "plone.multilingual.interfaces.ITranslatable"
-
-        results = catalog(UID=sl, object_provides=object_provides)
-        SLOBs = [r.getObject() for r in results]
-
-        for ob in SLOBs:
-            all_obs.add(ob)
-            # recursive
-            if self.recursive is True and ob.isPrincipiaFolderish:
-                [all_obs.add(x) for x in self._getObjectsByPath(ob)]
-
-        return list(all_obs)
 
     def _getObjectsByPath(self, ob=None):
         catalog = getToolByName(self.context, 'portal_catalog')
@@ -277,9 +253,7 @@ class XLIFFExporter(object):
         return [r.getObject() for r in results]
 
     def export(self):
-        if self.export_shoppinglist is True:
-            objects = self._getObjectsFromShoppinglist()
-        elif self.recursive is True:
+        if self.recursive is True:
             objects = self._getObjectsByPath()
         else:
             objects = [self.context]

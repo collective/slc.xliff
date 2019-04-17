@@ -46,22 +46,25 @@ class BaseDXAttributeExtractor(object):
                     "Exporting language independent attribute %s, "
                     "this may give unexpected results during import such as all "
                     "language versions have the value of the last language set "
-                    "in the attribute!" % key)
+                    "in the attribute!", key)
 
             value = field.get(self.context)
             if IRichTextValue.providedBy(value):
-                value = value.raw
-            if isinstance(value, six.text_type):
-                value = value.encode('UTF-8')
+                if value.raw is None:
+                    value = ''
+                else:
+                    value = value.raw
+            if isinstance(value, six.binary_type):
+                value = value.decode('UTF-8')
 
             data = dict(id=key,
                         value=value,
                         source_language=source_language)
 
             if html_compatibility:
-                attrs.append(HTML_ATTR_BODY % data)
+                attrs.append(HTML_ATTR_BODY.format(**data))
             else:
-                attrs.append(XLIFF_ATTR_BODY % data)
+                attrs.append(XLIFF_ATTR_BODY.format(**data))
 
         return attrs
 

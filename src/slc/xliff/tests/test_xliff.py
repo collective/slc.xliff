@@ -33,20 +33,20 @@ def prepare_contents_in_language(soup, lang="de", lang_name="german"):
     given translation with dummy texts showing the language
     """
 
-    new_title = NavigableString("My {} Title".format(lang_name))
+    new_title = NavigableString("My {0} Title".format(lang_name))
     soup.find("trans-unit", attrs={"id": "title"}).findNext("target").append(new_title)
-    new_description = NavigableString("My {} Description".format(lang_name))
+    new_description = NavigableString("My {0} Description".format(lang_name))
     soup.find("trans-unit", attrs={"id": "description"}).findNext("target").append(
         new_description
     )
-    new_text = NavigableString("<p>My {} Text</p>".format(lang_name))
+    new_text = NavigableString("<p>My {0} Text</p>".format(lang_name))
     soup.find("trans-unit", attrs={"id": "text"}).findNext("target").append(new_text)
     xliffstr = soup.prettify()
     xliffstr = xliffstr.replace(
-        '<target xml:lang="en">', '<target xml:lang="{}">'.format(lang)
+        '<target xml:lang="en">', '<target xml:lang="{0}">'.format(lang)
     )
     xliffstr = xliffstr.replace(
-        'target-language=""', 'target-language="{}"'.format(lang)
+        'target-language=""', 'target-language="{0}"'.format(lang)
     )
 
     return xliffstr

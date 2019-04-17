@@ -67,15 +67,15 @@ class ExportXliffForm(form.Form):
         if zip is True:
             self.request.response.setHeader('Content-type', 'application/zip')
             self.request.response.setHeader('Content-Disposition',
-                                            'attachment; filename=xliff_export_%s.zip' % DateTime().strftime('%Y-%m-%d'))
+                                            'attachment; filename=xliff_export_{0}.zip'.format(DateTime().strftime('%Y-%m-%d')))
         elif html_compatibility and single_file:
             self.request.response.setHeader('Content-type', 'text/html')
             self.request.response.setHeader('Content-Disposition',
-                                            'attachment; filename=%s_xliff.html' % context.getId())
+                                            'attachment; filename={0}_xliff.html'.format(context.getId()))
         elif single_file:
             self.request.response.setHeader('Content-type', 'text/xml')
             self.request.response.setHeader('Content-Disposition',
-                                            'attachment; filename=%s.xliff' % context.getId())
+                                            'attachment; filename={0}.xliff'.format(context.getId()))
         else:
             pass    # Should not happen
         self.request.response.write(data)

@@ -106,8 +106,8 @@ class XLIFFImporter(object):
             file_sections = soup.findAll('file')
             if soup.findAll('file') == []:
                 errors.append((
-                    'Empty File?', '%s contains no file sections.'
-                    % xliff[0]))
+                    'Empty File?', '{0} contains no file sections.'.format(xliff[0])
+                    ))
 
             for section in file_sections:
                 if api.env.debug_mode():
@@ -148,7 +148,7 @@ class XLIFFImporter(object):
             if len(results) != 1:
                 #raise ValueError, "Uid catalog should return exactly one
                 #result but returned %s." % len(results)
-                raise KeyError("Invalid OID %s" % oid)
+                raise KeyError("Invalid OID {0}".format(oid))
             source_ob = results[0].getObject()
         except KeyError:
             # old style xliff file. Using path
@@ -158,7 +158,7 @@ class XLIFFImporter(object):
 
         if source_ob is None:
             raise ValueError(
-                "%s not found, can not add translation." % data['original'])
+                "{0} not found, can not add translation.".format(data['original']))
 
         # If the source object is language-neutral, it must receive a language
         # prior to translation
@@ -283,16 +283,16 @@ class XLIFFExporter(object):
             if self.single_file is True:    # single file as zip
                 if len(xliff_pages) == 1:
                     zf.writestr(
-                        '%.xliff' % xliff_pages[0][0], HEAD % dict(content=xliff_pages[0][1]))
+                        '{0}.xliff'.format(xliff_pages[0][0]), HEAD.format(content=xliff_pages[0][1]))
                 else:
                     data = [x[1] for x in xliff_pages]
                     zf.writestr(
-                        'export.xliff', HEAD % dict(content="\n".join(data)))
+                        'export.xliff', HEAD.format(content="\n".join(data)))
 
             # multiple files as zip
             else:
                 for page in xliff_pages:
-                    zf.writestr('%.xliff' % page[0], HEAD % dict(content=page[1]))
+                    zf.writestr('{0}.xliff'.format(page[0]), HEAD.format(content=page[1]))
 
             zf.close()
             Z.seek(0)
@@ -305,7 +305,7 @@ class XLIFFExporter(object):
             # the filenames
             content = [x[1] for x in xliff_pages]
             content = "\n".join(content)
-            content = HEAD % dict(content=content)
+            content = HEAD.format(content=content)
             # Set that as it has been selected implicitly by specifying
             # multiple files but not selecting zip
             self.single_file = True
@@ -334,9 +334,9 @@ class XLIFF(object):
                     attrs="\n".join(attrs),)
 
         if html_compatibility:
-            filedata = HTML_FILE_BODY % data
+            filedata = HTML_FILE_BODY.format(**data)
         else:
-            filedata = XLIFF_FILE_BODY % data
+            filedata = XLIFF_FILE_BODY.format(**data)
 
         return filedata
 

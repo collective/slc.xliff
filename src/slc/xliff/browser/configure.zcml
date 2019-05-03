@@ -37,4 +37,12 @@
         layer="..interfaces.ISlcXliff"
         />
 
+    <browser:page
+        for="*"
+        name="export_xliff_contents"
+        permission="cmf.ModifyPortalContent"
+        class=".xliff_forms.XliffExportView"
+        layer="..interfaces.ISlcXliff"
+    />
+
 </configure>

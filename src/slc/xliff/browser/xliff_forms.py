@@ -12,6 +12,7 @@ from z3c.form import button
 from z3c.form import field
 from z3c.form import form
 from zope.component import getUtility
+from Products.Five.browser import BrowserView
 
 
 class ExportXliffForm(form.Form):
@@ -40,12 +41,55 @@ class ExportXliffForm(form.Form):
     def action_export(self, action):
         context = aq_inner(self.context)
         data, errors = self.extractData()
+        recursive = int(bool(data.get('recursive')))
+        single_file = int(bool(data.get('single_file')))
+        zip = int(bool(data.get('zip')))
+        html_compatibility = int(bool(data.get('html_compatibility')))
 
-        recursive = bool(data.get('recursive'))
-        single_file = bool(data.get('single_file'))
-        zip = bool(data.get('zip'))
-        html_compatibility = bool(data.get('html_compatibility'))
+        return self.request.response.redirect(
+            self.context.absolute_url() + '/@@export_xliff_contents?recursive={}&single_file={}&zip={}&html_compatibility={}'.format(
+                recursive, single_file, zip, html_compatibility)
+        )
 
+
+class ImportXliffForm(form.Form):
+    """ Form for importing xliff
+    """
+    fields = field.Fields(IImportParams)
+    ignoreContext = True
+
+    label = _(u"Import Xliff")
+
+    @button.buttonAndHandler(_(u'Import'))
+    def handleApply(self, action):
+        data, errors = self.extractData()
+        context = aq_inner(self.context)
+        xliff_file = data['xliff_file']
+        xliffimporter = getUtility(IXLIFFImporter)
+        errors = xliffimporter.upload(
+            xliff_file, html_compatibility=False, request=context.REQUEST)
+        if errors != []:
+            error = ["%s: %s" % x for x in errors]
+            confirm = _(u"Error while importing Xliff.\n " + "\n".join(error))
+            IStatusMessage(self.request).addStatusMessage(confirm, type='warn')
+        else:
+            confirm = _(u"Xliff import successful.")
+            IStatusMessage(self.request).addStatusMessage(confirm, type='info')
+
+        self.request.response.redirect(context.absolute_url() + '/@@xliffimport')
+
+        return ''
+
+
+class XliffExportView(BrowserView):
+    def __call__(self):
+        data = self.request.form
+        recursive = bool(int(data.get('recursive')))
+        single_file = bool(int(data.get('single_file')))
+        zip = bool(int(data.get('zip')))
+        html_compatibility = bool(int(data.get('html_compatibility')))
+
+        context = aq_inner(self.context)
         if self.context.isPrincipiaFolderish:
             container = context
         else:
@@ -80,32 +124,3 @@ class ExportXliffForm(form.Form):
             pass    # Should not happen
         self.request.response.write(data)
         return self.request.response
-
-
-class ImportXliffForm(form.Form):
-    """ Form for importing xliff
-    """
-    fields = field.Fields(IImportParams)
-    ignoreContext = True
-
-    label = _(u"Import Xliff")
-
-    @button.buttonAndHandler(_(u'Import'))
-    def handleApply(self, action):
-        data, errors = self.extractData()
-        context = aq_inner(self.context)
-        xliff_file = data['xliff_file']
-        xliffimporter = getUtility(IXLIFFImporter)
-        errors = xliffimporter.upload(
-            xliff_file, html_compatibility=False, request=context.REQUEST)
-        if errors != []:
-            error = ["%s: %s" % x for x in errors]
-            confirm = _(u"Error while importing Xliff.\n " + "\n".join(error))
-            IStatusMessage(self.request).addStatusMessage(confirm, type='warn')
-        else:
-            confirm = _(u"Xliff import successful.")
-            IStatusMessage(self.request).addStatusMessage(confirm, type='info')
-
-        self.request.response.redirect(context.absolute_url() + '/@@xliffimport')
-
-        return ''

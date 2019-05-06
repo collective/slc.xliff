@@ -9,7 +9,7 @@ from setuptools import setup, find_packages
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '2.0b3.dev0'
+version = '3.0b3.dev0'
 
 long_description = (
     read('README.rst')
@@ -20,7 +20,7 @@ long_description = (
     + '\n'
     )
 
-tests_require = ['mock', 'manuel', 'plone.app.testing', 'Pillow']
+tests_require = ['mock', 'manuel', 'plone.app.testing', 'Pillow', 'plone.testing', 'plone.app.robotframework[debug]', 'plone.app.contenttypes']
 
 setup(name='slc.xliff',
       version=version,
@@ -29,9 +29,13 @@ setup(name='slc.xliff',
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
         "Framework :: Plone",
-        "Framework :: Zope2",
-        "Framework :: Zope3",
+        "Framework :: Plone :: 5.0",
+        "Framework :: Plone :: 5.1",
+        "Framework :: Plone :: 5.2",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "License :: OSI Approved :: European Union Public Licence 1.1 (EUPL 1.1)",
@@ -39,7 +43,7 @@ setup(name='slc.xliff',
       keywords='xliff translation import export',
       author='Syslab.com GmbH',
       author_email='info@syslab.com',
-      url='https://svn.plone.org/svn/collective/slc.xliff',
+      url='https://github.com/collective/slc.xliff',
       license='GPL + EUPL',
       packages=find_packages('src'),
       package_dir={'': 'src'},
@@ -51,7 +55,10 @@ setup(name='slc.xliff',
           'z3c.autoinclude',
           'zope.component',
           'plone.app.contenttypes',
-          'plone.app.multilingual[archetypes,dexterity]',
+          'plone.app.multilingual',
+          'plone.api',
+          'BeautifulSoup4',
+          'six',
           # -*- Extra requirements: -*-
       ],
       tests_require=tests_require,

@@ -1,41 +1,39 @@
 # -*- coding: utf-8 -*-
-import zipfile
-import logging
-
 from Acquisition import aq_inner
-import HTMLParser
-
-from zope.component import adapts
-from zope.interface import implements
-from zope.schema import getFieldsInOrder
-from zope.site.hooks import getSite
-
+from bs4 import BeautifulSoup
+from plone import api
+from plone.app.multilingual.dx.interfaces import ILanguageIndependentField
+from plone.app.multilingual.interfaces import ITranslatable
+from plone.app.multilingual.interfaces import ITranslationManager
 from plone.app.textfield.interfaces import IRichText
 from plone.app.textfield.value import RichTextValue
 from plone.behavior.interfaces import IBehaviorAssignable
 from plone.dexterity.interfaces import IDexterityContent
-from plone.multilingual.interfaces import ITranslatable
-from plone.multilingual.interfaces import ITranslationManager
-from plone.multilingualbehavior.interfaces import ILanguageIndependentField
-
-from Products.Archetypes.interfaces import IBaseObject
-from Products.Archetypes.utils import shasattr
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import safe_unicode
 from Products.statusmessages.interfaces import IStatusMessage
+from six import BytesIO
+from six import StringIO
+from slc.xliff.interfaces import IAttributeExtractor
+from slc.xliff.interfaces import IXLIFF
+from slc.xliff.interfaces import IXLIFFExporter
+from slc.xliff.interfaces import IXLIFFImporter
+from slc.xliff.templates.html import HTML_FILE_BODY
+from slc.xliff.templates.html import HTML_HEAD
+from slc.xliff.templates.xliff import XLIFF_FILE_BODY
+from slc.xliff.templates.xliff import XLIFF_HEAD
+from zope.component import adapter
+from zope.interface import implementer
+from zope.schema import getFieldsInOrder
+from zope.site.hooks import getSite
 
-from Globals import DevelopmentMode
-from StringIO import StringIO
+import logging
+import six.moves.html_parser
+import zipfile
 
-from slc.xliff.BeautifulSoup import BeautifulSoup
-from slc.xliff.interfaces import IXLIFFExporter, IXLIFFImporter, IXLIFF, \
-    IAttributeExtractor
-
-from templates.xliff import XLIFF_HEAD, XLIFF_FILE_BODY
-from templates.html import HTML_HEAD, HTML_FILE_BODY
 
 logger = logging.getLogger('slc.xliff')
-html_parser = HTMLParser.HTMLParser()
+html_parser = six.moves.html_parser.HTMLParser()
 
 
 def get_dx_schema(context):
@@ -50,11 +48,10 @@ def get_dx_schema(context):
     return schema
 
 
+@implementer(IXLIFFImporter)
 class XLIFFImporter(object):
     """ utility to reimport xliff translations and create/edit the respective
     objects """
-
-    implements(IXLIFFImporter)
 
     def upload(self, xliff_file, html_compatibility=False, request=None):
         """ write one or more xliff documents from a file or zip onto objects
@@ -81,7 +78,7 @@ class XLIFFImporter(object):
             return errors
 
         if filetype == 'zip':
-            Z = StringIO()
+            Z = BytesIO()
             Z.write(data)
             zf = zipfile.ZipFile(Z, 'r')
             testzip = zf.testzip()
@@ -109,19 +106,19 @@ class XLIFFImporter(object):
             file_sections = soup.findAll('file')
             if soup.findAll('file') == []:
                 errors.append((
-                    'Empty File?', '%s contains no file sections.'
-                    % xliff[0]))
+                    'Empty File?', '{0} contains no file sections.'.format(xliff[0])
+                    ))
 
             for section in file_sections:
-                if DevelopmentMode:
+                if api.env.debug_mode():
                     self._setXLIFF(section, target_language=target_language)
                 else:
                     try:
                         self._setXLIFF(
                             section, target_language=target_language)
-                    except ValueError, ve:
+                    except ValueError as ve:
                         errors.append(('Target Object', str(ve)))
-                    except Exception, e:
+                    except Exception as e:
                         errors.append(('General Exception', str(e)))
                         raise e
 
@@ -136,32 +133,32 @@ class XLIFFImporter(object):
     def _setXLIFF(self, data, target_language=''):
         """ Set the data on one object """
         site = getSite()
-        uid_catalog = getToolByName(site, 'uid_catalog')
+        portal_catalog = getToolByName(site, 'portal_catalog')
 
         if target_language == '':
-            target_language = data['target-language'].encode('ascii')
+            target_language = data['target-language']
 
         # nothing to do if there is no target language
         if not target_language:
             return
 
         try:
-            oid = data['oid'].encode('ascii')
-            results = uid_catalog(UID=oid)
+            oid = data['oid']
+            results = portal_catalog(UID=oid)
             if len(results) != 1:
                 #raise ValueError, "Uid catalog should return exactly one
                 #result but returned %s." % len(results)
-                raise KeyError, "Invalid OID %s" % oid
+                raise KeyError("Invalid OID {0}".format(oid))
             source_ob = results[0].getObject()
         except KeyError:
             # old style xliff file. Using path
             #print "Using path to find target object"
-            path = data['original'].encode('utf-8')
+            path = data['original']
             source_ob = site.restrictedTraverse(path, None)
 
         if source_ob is None:
             raise ValueError(
-                "%s not found, can not add translation." % data['original'].encode('utf-8'))
+                "{0} not found, can not add translation.".format(data['original']))
 
         # If the source object is language-neutral, it must receive a language
         # prior to translation
@@ -182,14 +179,11 @@ class XLIFFImporter(object):
             self.new_translations += 1
         target_ob = tm.get_translation(target_language)
 
-        if IBaseObject.providedBy(target_ob):
-            # We dont want the id to get renamed to match the title
-            target_ob.unmarkCreationFlag()
-
         values = {}
+
         for unit in data.findAll('trans-unit'):
 
-            fieldname = unit['id'].encode('utf-8')
+            fieldname = unit['id']
             value = unit.find('target').renderContents('utf-8').strip()
 
             # Note: We don't use xliff to remove values, so no value means no
@@ -216,55 +210,26 @@ class XLIFFImporter(object):
                 elif name in values:
                     value = values[name]
                     if IRichText.providedBy(field):
-                        value = RichTextValue(value)
+                        mimeType = getattr(source_ob, name).mimeType
+                        outputMimeType = getattr(source_ob, name).outputMimeType
+                        value = RichTextValue(value, mimeType, outputMimeType)
                     schema[name].set(target_ob, value)
 
-        else:
-            # Archetypes
-            target_ob.processForm(data=1, metadata=1, values=values)
-        # Set the correct format
-        if shasattr(source_ob, 'text_format'):
-            target_ob.setFormat(source_ob.text_format)
         self.total += 1
 
 
+@implementer(IXLIFFExporter)
 class XLIFFExporter(object):
     """ Adapter to generate an xliff representation from a content object """
-
-    implements(IXLIFFExporter)
 
     recursive = False
     single_file = True
     html_compatibility = False
     zip = False
     source_language = "en"
-    export_shoppinglist = False
-    shoppinglist = list()
 
     def __init__(self, context):
         self.context = context
-
-    def _getObjectsFromShoppinglist(self):
-        context = aq_inner(self.context)
-        all_obs = set()
-
-        catalog = getToolByName(context, 'portal_catalog')
-        mtool = getToolByName(context, 'portal_membership')
-        member = mtool.getAuthenticatedMember()
-
-        sl = member.getProperty('shoppinglist', tuple())
-        object_provides = "plone.multilingual.interfaces.ITranslatable"
-
-        results = catalog(UID=sl, object_provides=object_provides)
-        SLOBs = [r.getObject() for r in results]
-
-        for ob in SLOBs:
-            all_obs.add(ob)
-            # recursive
-            if self.recursive is True and ob.isPrincipiaFolderish:
-                [all_obs.add(x) for x in self._getObjectsByPath(ob)]
-
-        return list(all_obs)
 
     def _getObjectsByPath(self, ob=None):
         catalog = getToolByName(self.context, 'portal_catalog')
@@ -277,19 +242,18 @@ class XLIFFExporter(object):
         else:
             path = "/".join(ob.getPhysicalPath())
 
-        object_provides = "plone.multilingual.interfaces.ITranslatable"
+        object_provides = "plone.app.multilingual.interfaces.ITranslatable"
         results = catalog(path=path, object_provides=object_provides)
         # make a real list out the LazyMap
         results = list(results)
         # sort by path, so that top-level object will get translated first
-        results.sort(lambda x, y: cmp(len(x.getPath()), len(y.getPath())))
+
+        results.sort(key=lambda x: len(x.getPath().split('/')))
 
         return [r.getObject() for r in results]
 
     def export(self):
-        if self.export_shoppinglist is True:
-            objects = self._getObjectsFromShoppinglist()
-        elif self.recursive is True:
+        if self.recursive is True:
             objects = self._getObjectsByPath()
         else:
             objects = [self.context]
@@ -313,22 +277,22 @@ class XLIFFExporter(object):
                 xob.render(self.html_compatibility, self.source_language),))
 
         if self.zip is True:
-            Z = StringIO()
+            Z = BytesIO()
             zf = zipfile.ZipFile(Z, 'w')
 
             if self.single_file is True:    # single file as zip
                 if len(xliff_pages) == 1:
                     zf.writestr(
-                        xliff_pages[0][0], HEAD % dict(content=xliff_pages[0][1]))
+                        '{0}.xliff'.format(xliff_pages[0][0]), HEAD.format(content=xliff_pages[0][1]))
                 else:
                     data = [x[1] for x in xliff_pages]
                     zf.writestr(
-                        'export.xliff', HEAD % dict(content="\n".join(data)))
+                        'export.xliff', HEAD.format(content="\n".join(data)))
 
             # multiple files as zip
             else:
                 for page in xliff_pages:
-                    zf.writestr(page[0], HEAD % dict(content=page[1]))
+                    zf.writestr('{0}.xliff'.format(page[0]), HEAD.format(content=page[1]))
 
             zf.close()
             Z.seek(0)
@@ -341,7 +305,7 @@ class XLIFFExporter(object):
             # the filenames
             content = [x[1] for x in xliff_pages]
             content = "\n".join(content)
-            content = HEAD % dict(content=content)
+            content = HEAD.format(content=content)
             # Set that as it has been selected implicitly by specifying
             # multiple files but not selecting zip
             self.single_file = True
@@ -349,11 +313,10 @@ class XLIFFExporter(object):
         return content
 
 
+@adapter(ITranslatable)
+@implementer(IXLIFF)
 class XLIFF(object):
     """ """
-
-    adapts(ITranslatable)
-    implements(IXLIFF)
 
     def __init__(self, context):
         self.context = context
@@ -371,9 +334,9 @@ class XLIFF(object):
                     attrs="\n".join(attrs),)
 
         if html_compatibility:
-            filedata = HTML_FILE_BODY % data
+            filedata = HTML_FILE_BODY.format(**data)
         else:
-            filedata = XLIFF_FILE_BODY % data
+            filedata = XLIFF_FILE_BODY.format(**data)
 
         return filedata
 

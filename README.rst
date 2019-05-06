@@ -1,6 +1,16 @@
 slc.xliff Package Readme
 ************************
 
+.. image:: https://img.shields.io/pypi/v/slc.xliff.svg
+        :target: https://pypi.python.org/pypi/slc.xliff
+
+.. image:: https://travis-ci.org/collective/slc.xliff.svg?branch=master
+        :target: https://travis-ci.org/collective/slc.xliff
+
+.. image:: https://coveralls.io/repos/github/collective/slc.xliff/badge.svg?branch=master
+        :target: https://coveralls.io/github/collective/slc.xliff?branch=master
+
+
 .. contents::
 
 .. Note!
@@ -29,13 +39,12 @@ Export
 
 Most content objects in Plone can be exported to XLIFF. On any page in a portal you can select *Actions->XLIFF Export*. Here you have the following options:
 
-* Recursive subtree export? 
-* Generate a single file? 
+* Recursive subtree export?
+* Generate a single file?
 * Download as zip?
 * HTML compatibility mode (recommended)
-* Export my current Shoppinglist
 
-These options are mostly self explanatory. The Shoppinglist functionality lets you select a variety of objects via the *Actions->Add to shopping list* menu and then export them all at once from the *Xliff Export* form.
+These options are mostly self explanatory.
 
 If your translator is able to read XLIFF natively (e.g. the translation program *Trados* is able to do that), send the native xliff version, otherwise make sure you have checked the HTML compatibility option. That generates an HTMLized XLIFF version which can be edited and translated using a common HTML editor.
 
@@ -45,7 +54,7 @@ The XLIFF file contains a reference to the id of the object translated as well a
 Import
 ------
 
-When the translations have been returned they can be imported via the *Actions->Import Xliff* menu. Select *HTML compatibility mode* if the XLIFF file also used that option, or if an XML version was mistakenly edited in an HTML editor and converted by the translator. 
+When the translations have been returned they can be imported via the *Actions->Import Xliff* menu. Select *HTML compatibility mode* if the XLIFF file also used that option, or if an XML version was mistakenly edited in an HTML editor and converted by the translator.
 
 A single .xliff file can be uploaded which contains multiple translations. Alternatively a .zip file can be uploaded which contains many .xliff files. If the filenames are prefixed with the language code then that code will be used to determine the language, even if the target-language attribute is not set correctly e.g. my-test-file_de.xliff will be treated as the German translation of my-test-file.
 

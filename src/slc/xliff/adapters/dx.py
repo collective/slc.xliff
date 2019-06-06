@@ -98,7 +98,7 @@ class EventAttributeExtractor(BaseDXAttributeExtractor):
 class NewsItemAttributeExtractor(BaseDXAttributeExtractor):
     """ Adapter to retrieve attributes from a standard event based
     object """
-    attrs = ['title', 'description', 'imageCaption', 'text']
+    attrs = ['title', 'description', 'image_caption', 'text']
 
 
 @implementer(IAttributeExtractor)

@@ -210,8 +210,14 @@ class XLIFFImporter(object):
                 elif name in values:
                     value = values[name]
                     if IRichText.providedBy(field):
-                        mimeType = getattr(source_ob, name).mimeType
-                        outputMimeType = getattr(source_ob, name).outputMimeType
+                        it = getattr(source_ob, name)
+                        if it is not None:
+                            mimeType = it.mimeType
+                            outputMimeType = it.outputMimeType
+                        else:
+                            # Default
+                            mimeType = 'text/html'
+                            outputMimeType = 'text/x-html-safe'
                         value = RichTextValue(value, mimeType, outputMimeType)
                     schema[name].set(target_ob, value)
 

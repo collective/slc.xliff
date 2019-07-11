@@ -1,7 +1,7 @@
 slc.xliff Changelog
 ===================
 
-3.0b3 (unreleased)
+3.0b1 (2019-07-11)
 ------------------
 
 - Changes to support python3 and Plone 5.2

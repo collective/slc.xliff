@@ -20,3 +20,8 @@ recursive-include src *.pt
 recursive-include src *.txt
 recursive-include src *.xml
 recursive-include src *.zcml
+
+include base.cfg
+include test_plone50.cfg
+include test_plone51.cfg
+include test_plone52.cfg

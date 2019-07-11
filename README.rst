@@ -2,10 +2,10 @@ slc.xliff Package Readme
 ************************
 
 .. image:: https://img.shields.io/pypi/v/slc.xliff.svg
-        :target: https://pypi.python.org/pypi/slc.xliff
+        :target: https://pypi.org/project/slc.xliff/
 
-.. image:: https://travis-ci.org/collective/slc.xliff.svg?branch=master
-        :target: https://travis-ci.org/collective/slc.xliff
+.. image:: https://travis-ci.com/collective/slc.xliff.svg?branch=master
+        :target: https://travis-ci.com/collective/slc.xliff
 
 .. image:: https://coveralls.io/repos/github/collective/slc.xliff/badge.svg?branch=master
         :target: https://coveralls.io/github/collective/slc.xliff?branch=master

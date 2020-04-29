@@ -4,7 +4,8 @@ slc.xliff Changelog
 3.0b2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- No changes.
+  [erral]
 
 
 3.0b1 (2019-07-11)

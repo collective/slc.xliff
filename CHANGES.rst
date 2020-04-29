@@ -1,8 +1,8 @@
 slc.xliff Changelog
 ===================
 
-3.0b2 (unreleased)
-------------------
+3.0 (2020-04-29)
+----------------
 
 - No changes.
   [erral]

@@ -16,20 +16,16 @@ from slc.xliff.xliff import get_dx_schema
 from slc.xliff.xliff import logger
 from zope.component import adapter
 from zope.interface import implementer
-import six
-
 
 
 @implementer(IAttributeExtractor)
 @adapter(IDexterityContent)
 class BaseDXAttributeExtractor(object):
-    """ Adapter to retrieve attributes from a standard Dexterity object.
-    """
-
+    """Adapter to retrieve attributes from a standard Dexterity object."""
 
     # If you are writing your own Extractor, inherit from this one and simply
     # override the attrs attribute
-    attrs = ['title', 'description']
+    attrs = ["title", "description"]
 
     def __init__(self, context):
         self.context = aq_inner(context)
@@ -43,23 +39,23 @@ class BaseDXAttributeExtractor(object):
             field = schema[key]
             if ILanguageIndependentField.providedBy(field):
                 logger.warn(
-                    "Exporting language independent attribute %s, "
-                    "this may give unexpected results during import such as all "
-                    "language versions have the value of the last language set "
-                    "in the attribute!", key)
+                    "Exporting language independent attribute %s, this may"
+                    " give unexpected results during import such as all"
+                    " language versions have the value of the last language"
+                    " set in the attribute!",
+                    key,
+                )
 
             value = field.get(self.context)
             if IRichTextValue.providedBy(value):
                 if value.raw is None:
-                    value = ''
+                    value = ""
                 else:
                     value = value.raw
-            if isinstance(value, six.binary_type):
-                value = value.decode('UTF-8')
+            if isinstance(value, bytes):
+                value = value.decode("UTF-8")
 
-            data = dict(id=key,
-                        value=value,
-                        source_language=source_language)
+            data = dict(id=key, value=value, source_language=source_language)
 
             if html_compatibility:
                 attrs.append(HTML_ATTR_BODY.format(**data))
@@ -72,38 +68,43 @@ class BaseDXAttributeExtractor(object):
 @implementer(IAttributeExtractor)
 @adapter(IDocument)
 class DocumentAttributeExtractor(BaseDXAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard document based
-    object """
-    attrs = ['title', 'description', 'text']
+    """Adapter to retrieve attributes from a standard document based
+    object"""
+
+    attrs = ["title", "description", "text"]
 
 
 @implementer(IAttributeExtractor)
 @adapter(ICollection)
 class TopicAttributeExtractor(BaseDXAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard document based
-    object """
-    attrs = ['title', 'description', 'text']
+    """Adapter to retrieve attributes from a standard document based
+    object"""
+
+    attrs = ["title", "description", "text"]
 
 
 @implementer(IAttributeExtractor)
 @adapter(IEvent)
 class EventAttributeExtractor(BaseDXAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard event based
-    object """
-    attrs = ['title', 'description', 'location', 'text']
+    """Adapter to retrieve attributes from a standard event based
+    object"""
+
+    attrs = ["title", "description", "location", "text"]
 
 
 @implementer(IAttributeExtractor)
 @adapter(INewsItem)
 class NewsItemAttributeExtractor(BaseDXAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard event based
-    object """
-    attrs = ['title', 'description', 'image_caption', 'text']
+    """Adapter to retrieve attributes from a standard event based
+    object"""
+
+    attrs = ["title", "description", "image_caption", "text"]
 
 
 @implementer(IAttributeExtractor)
 @adapter(ILink)
 class LinkAttributeExtractor(BaseDXAttributeExtractor):
-    """ Adapter to retrieve attributes from a standard event based
-    object """
-    attrs = ['title', 'description', 'remoteUrl']
+    """Adapter to retrieve attributes from a standard event based
+    object"""
+
+    attrs = ["title", "description", "remoteUrl"]

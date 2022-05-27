@@ -69,7 +69,6 @@ setup(
         "plone.app.multilingual",
         "plone.api",
         "BeautifulSoup4",
-        "six",
         # -*- Extra requirements: -*-
     ],
     tests_require=tests_require,

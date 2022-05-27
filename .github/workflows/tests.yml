@@ -46,7 +46,7 @@ jobs:
 
       # buildout
       - name: buildout
-        run: buildout -t 10 -c test_plone${{ matrix.plone-version }}.x.cfg code-analysis:return-status-codes=True
+        run: buildout -t 10 -c test_plone${{ matrix.plone-version }}.cfg code-analysis:return-status-codes=True
         env:
           CI: true
 

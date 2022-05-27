@@ -13,7 +13,7 @@ from plone.dexterity.interfaces import IDexterityContent
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import safe_unicode
 from Products.statusmessages.interfaces import IStatusMessage
-from six import BytesIO
+from io import BytesIO
 from slc.xliff.interfaces import IAttributeExtractor
 from slc.xliff.interfaces import IXLIFF
 from slc.xliff.interfaces import IXLIFFExporter
@@ -26,15 +26,16 @@ from zope.component import adapter
 from zope.interface import implementer
 from zope.schema import getFieldsInOrder
 from zope.site.hooks import getSite
+from html import unescape
+from html.parser import HTMLParser
 
 import logging
 import re
-import six.moves.html_parser
 import zipfile
 
 
 logger = logging.getLogger("slc.xliff")
-html_parser = six.moves.html_parser.HTMLParser()
+html_parser = HTMLParser()
 
 
 def get_dx_schema(context):
@@ -205,7 +206,7 @@ class XLIFFImporter(object):
 
             # convert HTML entities
             value = safe_unicode(value)
-            value = html_parser.unescape(value)
+            value = unescape(value)
             values[fieldname] = value
 
         if IDexterityContent.providedBy(target_ob):

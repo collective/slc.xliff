@@ -13,12 +13,12 @@ jobs:
             plone-version: '52'
           - python-version: '3.8'
             plone-version: '52'
-          # - python-version: '3.7'
-          #   plone-version: '6.0'
-          # - python-version: '3.8'
-          #   plone-version: '6.0'
-          # - python-version: '3.9'
-          #   plone-version: '6.0'
+          - python-version: '3.7'
+            plone-version: '60'
+          - python-version: '3.8'
+            plone-version: '60'
+          - python-version: '3.9'
+            plone-version: '60'
 
     steps:
       # git checkout
@@ -42,7 +42,7 @@ jobs:
       - run: pip install virtualenv
       - run: pip install wheel
       - name: pip install
-        run: pip install -r requirements.txt -c constraints_plone${{ matrix.plone-version }}.txt
+        run: pip install -r requirements_plone${{ matrix.plone-version }}.txt -c constraints_plone${{ matrix.plone-version }}.txt
 
       # buildout
       - name: buildout

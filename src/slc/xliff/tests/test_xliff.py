@@ -9,13 +9,11 @@ from plone.app.testing import TEST_USER_ID
 from plone.app.textfield.value import RichTextValue
 from plone.dexterity.utils import createContentInContainer
 from plone.namedfile.file import NamedFile
-from six import StringIO
 from slc.xliff.interfaces import IXLIFFExporter
 from slc.xliff.interfaces import IXLIFFImporter
 from slc.xliff.tests.base import FUNCTIONAL_TESTING
 from slc.xliff.tests.base import INTEGRATION_TESTING
 from zope.component import getUtility
-from Products.CMFPlone.utils import safe_unicode
 from zipfile import ZipFile
 from tempfile import mktemp
 
@@ -29,18 +27,22 @@ except ImportError:
 
 
 def prepare_contents_in_language(soup, lang="de", lang_name="german"):
-    """ helper function to create an xliff file with contents translated in the
+    """helper function to create an xliff file with contents translated in the
     given translation with dummy texts showing the language
     """
 
     new_title = NavigableString("My {0} Title".format(lang_name))
-    soup.find("trans-unit", attrs={"id": "title"}).findNext("target").append(new_title)
-    new_description = NavigableString("My {0} Description".format(lang_name))
-    soup.find("trans-unit", attrs={"id": "description"}).findNext("target").append(
-        new_description
+    soup.find("trans-unit", attrs={"id": "title"}).findNext("target").append(
+        new_title
     )
+    new_description = NavigableString("My {0} Description".format(lang_name))
+    soup.find("trans-unit", attrs={"id": "description"}).findNext(
+        "target"
+    ).append(new_description)
     new_text = NavigableString("<p>My {0} Text</p>".format(lang_name))
-    soup.find("trans-unit", attrs={"id": "text"}).findNext("target").append(new_text)
+    soup.find("trans-unit", attrs={"id": "text"}).findNext("target").append(
+        new_text
+    )
     xliffstr = soup.prettify()
     xliffstr = xliffstr.replace(
         '<target xml:lang="en">', '<target xml:lang="{0}">'.format(lang)
@@ -120,7 +122,7 @@ class TestXliffImport(unittest.TestCase):
         transaction.commit()
 
     def test_upload_single_content(self):
-        """ We export the XLIFF file, change some contents and upload it to create
+        """We export the XLIFF file, change some contents and upload it to create
         the translated content
         """
 
@@ -137,7 +139,9 @@ class TestXliffImport(unittest.TestCase):
 
         xliffimporter = getUtility(IXLIFFImporter)
         xliff_file = NamedFile(
-            data=xliffstr_de, contentType="text/xml", filename=u"transl_de.xliff"
+            data=xliffstr_de,
+            contentType="text/xml",
+            filename=u"transl_de.xliff",
         )
 
         xliffimporter.upload(xliff_file, html_compatibility=False)
@@ -148,10 +152,12 @@ class TestXliffImport(unittest.TestCase):
         self.assertEqual(doc_de.Title(), "My german Title")
         self.assertIn("My german Description", doc_de.Description())
         self.assertEqual(doc_de.text.output, "<p>My german Text</p>")
-        self.assertEqual(doc_de.language_independent, "This should not change.")
+        self.assertEqual(
+            doc_de.language_independent, "This should not change."
+        )
 
     def test_upload_multiple_contents(self):
-        """ create contents in spanish and finish and upload as it was a single file """
+        """create contents in spanish and finish and upload as it was a single file"""
         xliffexporter = IXLIFFExporter(self.doc_en)
         xliffexporter.recursive = False
         xliffexporter.single_file = True
@@ -183,7 +189,9 @@ class TestXliffImport(unittest.TestCase):
         self.assertEqual(doc_es.Title(), "My spanish Title")
         self.assertIn("My spanish Description", doc_es.Description())
         self.assertEqual(doc_es.text.output, "<p>My spanish Text</p>")
-        self.assertEqual(doc_es.language_independent, "This should not change.")
+        self.assertEqual(
+            doc_es.language_independent, "This should not change."
+        )
 
         doc_fi = ITranslationManager(self.doc_en).get_translation("fi")
 
@@ -191,7 +199,9 @@ class TestXliffImport(unittest.TestCase):
         self.assertEqual(doc_fi.Title(), "My finnish Title")
         self.assertIn("My finnish Description", doc_fi.Description())
         self.assertEqual(doc_fi.text.output, "<p>My finnish Text</p>")
-        self.assertEqual(doc_fi.language_independent, "This should not change.")
+        self.assertEqual(
+            doc_fi.language_independent, "This should not change."
+        )
 
     def test_upload_zipfile(self):
         xliffexporter = IXLIFFExporter(self.doc_en)
@@ -203,10 +213,14 @@ class TestXliffImport(unittest.TestCase):
         xliffstr = xliffexporter.export()
 
         soup_es = BeautifulSoup(xliffstr, "xml")
-        xliffstr_es = prepare_contents_in_language(soup_es, "es", u"spanish zipped")
+        xliffstr_es = prepare_contents_in_language(
+            soup_es, "es", u"spanish zipped"
+        )
 
         soup_fi = BeautifulSoup(xliffstr, "xml")
-        xliffstr_fi = prepare_contents_in_language(soup_fi, "fi", u"finnish zipped")
+        xliffstr_fi = prepare_contents_in_language(
+            soup_fi, "fi", u"finnish zipped"
+        )
 
         tempfilename = mktemp(suffix=".zip")
         with open(tempfilename, "wb") as out:
@@ -218,7 +232,9 @@ class TestXliffImport(unittest.TestCase):
         with open(tempfilename, "rb") as out:
             xliffimporter = getUtility(IXLIFFImporter)
             zip_file = NamedFile(
-                data=out, contentType="application/zip", filename=u"transl_mixed.zip"
+                data=out,
+                contentType="application/zip",
+                filename=u"transl_mixed.zip",
             )
             xliffimporter.upload(zip_file, html_compatibility=False)
             doc_es = ITranslationManager(self.doc_en).get_translation("es")

@@ -36,3 +36,8 @@ class TestUtils(unittest.TestCase):
         """test the language in the middle of the filename is catched correctly"""
         filename = "filename_pt-br_filename.xliff"
         self.assertEqual(_guessLanguage(filename), "pt-br")
+
+    def test_guessLanguage_without_language(self):
+        """test that a filename without language code returns an empty string"""
+        filename = "filename_mixed.xliff"
+        self.assertEqual(_guessLanguage(filename), "")

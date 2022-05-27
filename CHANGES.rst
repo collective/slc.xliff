@@ -1,11 +1,17 @@
 slc.xliff Changelog
 ===================
 
-3.1 (unreleased)
+4.0 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Test only Plone 5.2 and 6.0
+  [erral]
 
+- Setup github actions
+  [erral]
+
+- Allow language variants (pt-br) when importing files
+  [erral]
 
 3.0 (2020-04-29)
 ----------------

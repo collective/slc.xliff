@@ -58,13 +58,3 @@ jobs:
       - name: test
         run: bin/test
 
-      # test no uncommited changes
-      - name: test no uncommited changes
-        run: ./test-no-uncommitted-doc-changes
-        env:
-          PYTHON_VERSION: ${{ matrix.python-version }}
-          PLONE_VERSION: ${{ matrix.plone-version }}
-
-      # test for broken links
-      - name: linkcheck
-        run: if [ "${{ matrix.plone-version }}" == "6.0" ] && [ ${{ matrix.python-version }} == '3.9' ]; then make docs-linkcheckbroken; fi

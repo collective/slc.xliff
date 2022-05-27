@@ -8,17 +8,17 @@ jobs:
       matrix:
         include:
           - python-version: '3.6'
-            plone-version: '5.2'
+            plone-version: '52'
           - python-version: '3.7'
-            plone-version: '5.2'
+            plone-version: '52'
           - python-version: '3.8'
-            plone-version: '5.2'
-          - python-version: '3.7'
-            plone-version: '6.0'
-          - python-version: '3.8'
-            plone-version: '6.0'
-          - python-version: '3.9'
-            plone-version: '6.0'
+            plone-version: '52'
+          # - python-version: '3.7'
+          #   plone-version: '6.0'
+          # - python-version: '3.8'
+          #   plone-version: '6.0'
+          # - python-version: '3.9'
+          #   plone-version: '6.0'
 
     steps:
       # git checkout
@@ -46,7 +46,7 @@ jobs:
 
       # buildout
       - name: buildout
-        run: buildout -t 10 -c plone-${{ matrix.plone-version }}.x.cfg code-analysis:return-status-codes=True
+        run: buildout -t 10 -c test_plone${{ matrix.plone-version }}.x.cfg code-analysis:return-status-codes=True
         env:
           CI: true
 

@@ -13,12 +13,12 @@ jobs:
             plone-version: '52'
           - python-version: '3.8'
             plone-version: '52'
-          # - python-version: '3.7'
-          #   plone-version: '6.0'
-          # - python-version: '3.8'
-          #   plone-version: '6.0'
-          # - python-version: '3.9'
-          #   plone-version: '6.0'
+          - python-version: '3.7'
+            plone-version: '6.0'
+          - python-version: '3.8'
+            plone-version: '6.0'
+          - python-version: '3.9'
+            plone-version: '6.0'
 
     steps:
       # git checkout

@@ -1,6 +1,8 @@
 from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
 from plone.app.multilingual.testing import MultipleLanguagesLayer
-from plone.app.multilingual.testing import PLONE_APP_MULTILINGUAL_PRESET_FIXTURE
+from plone.app.multilingual.testing import (
+    PLONE_APP_MULTILINGUAL_PRESET_FIXTURE,
+)
 from plone.app.testing import applyProfile
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
@@ -48,6 +50,9 @@ class SlcXliffLayer(PloneSandboxLayer):
         language_tool.addSupportedLanguage("de")
         language_tool.addSupportedLanguage("es")
         language_tool.addSupportedLanguage("fi")
+        language_tool.addSupportedLanguage("pt-br")
+        language_tool.addSupportedLanguage("en-us")
+        language_tool.addSupportedLanguage("es-es")
 
         applyProfile(portal, "plone.app.multilingual:default")
         applyProfile(portal, "slc.xliff:default")

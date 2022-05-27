@@ -28,7 +28,7 @@ class TestSetup(unittest.TestCase):
 
     def test_product_installed(self):
         """Test if slc.xliff is installed."""
-        self.assertTrue(self.installer.isProductInstalled("slc.xliff"))
+        self.assertTrue(self.installer.is_product_installed("slc.xliff"))
 
     def test_browserlayer(self):
         """Test that ISlcXliff is registered."""
@@ -50,12 +50,12 @@ class TestUninstall(unittest.TestCase):
             self.installer = api.portal.get_tool("portal_quickinstaller")
         roles_before = api.user.get_roles(TEST_USER_ID)
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
-        self.installer.uninstallProducts(["slc.xliff"])
+        self.installer.uninstall_product("slc.xliff")
         setRoles(self.portal, TEST_USER_ID, roles_before)
 
     def test_product_uninstalled(self):
         """Test if slc.xliff is cleanly uninstalled."""
-        self.assertFalse(self.installer.isProductInstalled("slc.xliff"))
+        self.assertFalse(self.installer.is_product_installed("slc.xliff"))
 
     def test_browserlayer_removed(self):
         """Test that ISlcXliff is removed."""

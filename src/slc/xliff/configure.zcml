@@ -4,7 +4,8 @@
     xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="slc.xliff">
 
-    <includeDependencies package="." />
+    <include package="plone.app.contenttypes" />
+    <include package="plone.app.multilingual" />
 
     <genericsetup:registerProfile
       name="default"

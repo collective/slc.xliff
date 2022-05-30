@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from pdb import Pdb
 from Acquisition import aq_inner
 from bs4 import BeautifulSoup
 from plone import api

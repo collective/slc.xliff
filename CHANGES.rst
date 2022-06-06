@@ -1,6 +1,12 @@
 slc.xliff Changelog
 ===================
 
+4.1 (unreleased)
+----------------
+
+- Nothing changed yet.
+
+
 4.0 (2022-06-06)
 ----------------
 

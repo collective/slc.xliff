@@ -1,7 +1,7 @@
 slc.xliff Changelog
 ===================
 
-4.0 (unreleased)
+4.0 (2022-06-06)
 ----------------
 
 - Test only Plone 5.2 and 6.0

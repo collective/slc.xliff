@@ -1,27 +1,16 @@
-include *.txt
+include *.in
+include *.py
 include *.rst
-global-exclude *pyc
-
-# added by check_manifest.py
+include *.txt
+include base.cfg
 include buildout.cfg
+include test_plone52.cfg
+include test_plone60.cfg
 recursive-include docs *.EUPL
 recursive-include docs *.GPL
 recursive-include docs *.txt
-recursive-include slc *.gif
-recursive-include slc *.pt
-recursive-include slc *.txt
-recursive-include slc *.xml
-recursive-include slc *.zcml
-
-# added by check_manifest.py
-include *.py
 recursive-include src *.gif
 recursive-include src *.pt
 recursive-include src *.txt
 recursive-include src *.xml
 recursive-include src *.zcml
-
-include base.cfg
-include test_plone50.cfg
-include test_plone51.cfg
-include test_plone52.cfg
